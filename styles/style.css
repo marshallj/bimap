@@ -1,0 +1,93 @@
+html, body {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  font-family: "Trebuchet MS";
+}
+
+#borderContainer {
+    width: 100%;
+    height: 100%;
+}
+
+#LayerListContainer {
+  padding: 0;
+  margin: 0;
+  height:100%;
+  width: 10%;
+  float: left;
+}
+
+#toolbar {
+  height: 45px;
+  background-color: red;
+}
+
+#navButtons {
+  margin-right: 20px;
+  float: right;
+}
+
+#search {
+  position: absolute;
+  left: 70px;
+  top: 30px;
+  z-index: 2;
+}
+
+#mapDiv {
+    height:100%;
+}
+
+/*#tpDrillDown {
+  height: 200px;
+}*/
+
+.navButton {
+  width: 16px;
+  height: 16px;
+  margin: 12px;
+}
+
+.zoominIcon {
+ background-image: url("../images/nav_zoomin.png");
+ width: 16px;
+ height: 16px;
+}
+
+.zoomoutIcon {
+ background-image: url("../images/nav_zoomout.png");
+ width: 16px;
+ height: 16px;
+}
+
+.zoomfullextIcon {
+ background-image: url("../images/nav_fullextent.png");
+ width: 16px;
+ height: 16px;
+}
+
+.zoomprevIcon {
+ background-image: url("../images/nav_previous.png");
+ width: 16px;
+ height: 16px;
+}
+
+.zoomnextIcon {
+ background-image: url("../images/nav_next.png");
+ width: 16px;
+ height: 16px;
+}
+
+.panIcon {
+ background-image: url("../images/nav_pan.png");
+ width: 16px;
+ height: 16px;
+}
+
+.deactivateIcon {
+ background-image: url("../images/nav_decline.png");
+ width: 16px;
+ height: 16px;
+}

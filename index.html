@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fire Explorer</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!--The viewport meta tag is used to improve the presentation and behavior of the samples
+      on iOS devices-->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+  <link rel="stylesheet" href="http://js.arcgis.com/3.14/dijit/themes/claro/claro.css">
+  <link rel="stylesheet" href="http://js.arcgis.com/3.14/esri/css/esri.css">
+  <link rel="stylesheet" href="styles/style.css">
+  <script src="http://js.arcgis.com/3.14/"></script>
+  <script src="js/app.js"></script>
+</head>
+<body class="claro">
+  <!-- <div id="LayerListContainer">
+    <div id="LayerList"></div>
+  </div> -->
+  <div id="borderContainer" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="gutters:true, liveSplitters:true" >
+    <div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top', splitter:false">
+      <h2 id="title">City of Greensboro - Fire Explorer</h2>
+      <div id="toolbar">
+        <div id="navButtons">
+          <button id="zoomin" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoominIcon"></button>
+          <button id="zoomout" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomoutIcon"></button>
+          <button id="zoomfullext" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomfullextIcon"></button>
+          <button id="zoomprev" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomprevIcon"></button>
+          <button id="zoomnext" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomnextIcon"></button>
+          <button id="pan" class="navButton" data-dojo-type="dijit/form/Button" iconClass="panIcon"></button>
+          <button id="deactivate" class="navButton" data-dojo-type="dijit/form/Button" iconClass="deactivateIcon"></button>
+        </div>
+
+      </div>
+    </div>
+    <div id="leftPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="minSize:50, region:'leading', splitter:true" style="width: 300px;">
+      <div id="tpDrillDown" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Fire Drill Down'" open=true>
+        <p>AGENCY: </p>
+        <p>DISTRICT: </p>
+        <p>REPORT: </p>
+        <p>RESPONSE: </p>
+      </div>
+      <div id="tpResults" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Results'" open=false></div>
+      <div id="tpFlowTest" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Hydrant Flow Test Info'" open=false></div>
+      <div id="tpFireSymbols" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Draw Fire Symbols'" open=false></div>
+      <div id="tpPlotIncidents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Plot Incidents'" open=false></div>
+      <div id="tpMapContents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Map Contents'" open=true></div>
+    </div>
+
+    <!-- <div data-dojo-type="dijit/layout/AccordionContainer" data-dojo-props="minSize:50, region:'leading', splitter:true" style="width: 300px;" id="leftAccordion">
+        <div data-dojo-type="dijit/layout/ContentPane" title="Fire Drill Down" selected="true">
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" title="Results">
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" title="Hydrant Flow Test Info">
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" title="Draw Fire Symbols">
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" title="Plot Incidents">
+        </div>
+        <div data-dojo-type="dijit/layout/ContentPane" title="Map Contents">
+        </div>
+    </div>--><!-- end AccordionContainer -->
+
+    <div id="mapDiv" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+      <div id="search"></div>
+    </div>
+  </div>
+</body>
+</html>
