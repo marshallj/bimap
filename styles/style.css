@@ -47,6 +47,11 @@ a:active {
   background-color: red;
 }
 
+#toolWidgets {
+  margin: 5px 0 0 20px;
+  float: left;
+}
+
 #navButtons {
   margin-right: 20px;
   float: right;
@@ -62,10 +67,6 @@ a:active {
 #mapDiv {
     height:100%;
 }
-
-/*#tpDrillDown {
-  height: 200px;
-}*/
 
 .navButton {
   width: 16px;
