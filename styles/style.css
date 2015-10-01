@@ -6,6 +6,29 @@ html, body {
   font-family: "Trebuchet MS";
 }
 
+#fireLinks {
+  float: right;
+  font-size: 1.1em;
+}
+
+a:link {
+    text-decoration: none;
+    color: #000;
+}
+
+a:visited {
+    text-decoration: none;
+    color: #000;
+}
+
+a:hover {
+    color: #f00;
+}
+
+a:active {
+    text-decoration: underline;
+}
+
 #borderContainer {
     width: 100%;
     height: 100%;
