@@ -17,6 +17,8 @@
   <!-- <div id="LayerListContainer">
     <div id="LayerList"></div>
   </div> -->
+
+  <div id="featureSearch"></div>
   <div id="borderContainer" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="gutters:true, liveSplitters:true" >
     <div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top', splitter:false">
       <div id="fireLinks">
@@ -25,10 +27,11 @@
         </p>
       </div>
       <h2 id="title">City of Greensboro - Fire Explorer</h2>
+
       <div id="toolbar">
-        <div id="toolWidgets">
-          <div id="gridSearch"></div>
-        </div>
+        <!-- <div id="toolWidgets">
+          <div id="featureSearch"></div>
+        </div> -->
         <div id="navButtons">
           <button id="zoomin" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoominIcon"></button>
           <button id="zoomout" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomoutIcon"></button>
@@ -43,14 +46,31 @@
     </div>
     <div id="leftPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="minSize:50, region:'leading', splitter:true" style="width: 300px;">
       <div id="tpDrillDown" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Fire Drill Down'" open=true>
-        <p id="agencyResult" class="drillDownResults"></p>
-        <p id="districtResult" class="drillDownResults"></p>
-        <p id="reportResult" class="drillDownResults"></p>
-        <p id="responseResult" class="drillDownResults"></p>
+        <ul id="mainResult" class="resultsLists">
+          <li id="agencyResult" class="drillDownResults"></li>
+          <li id="districtResult" class="drillDownResults"></li>
+          <li id="reportResult" class="drillDownResults"></li>
+          <li id="responseResult" class="drillDownResults"></li>
+        </ul>
+
+        <div id="closestStations">
+          <a id="stationsToggle" class="drillDownResults"></a>
+          <!-- <button id="stationsButton">Toggle Stations</button> -->
+          <ul id="stationsList" class="resultsLists">
+            <li id="st1" class="drillStationResults"></li>
+            <li id="st2" class="drillStationResults"></li>
+            <li id="st3" class="drillStationResults"></li>
+            <li id="st4" class="drillStationResults"></li>
+            <li id="st5" class="drillStationResults"></li>
+            <li id="st6" class="drillStationResults"></li>
+            <li id="st7" class="drillStationResults"></li>
+            <li id="st8" class="drillStationResults"></li>
+            <li id="st9" class="drillStationResults"></li>
+            <li id="st10" class="drillStationResults"></li>
+          </ul>
+        </div>
       </div>
-      <div id="tpResults" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Results'" open=false></div>
       <div id="tpFlowTest" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Hydrant Flow Test Info'" open=false></div>
-      <div id="tpFireSymbols" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Draw Fire Symbols'" open=false></div>
       <div id="tpPlotIncidents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Plot Incidents'" open=false></div>
       <div id="tpMapContents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Map Contents'" open=true></div>
     </div>

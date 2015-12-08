@@ -1,5 +1,6 @@
 var map, navToolbar, geocoder;
 
+
   require([
     "esri/map",
     "esri/layers/ArcGISDynamicMapServiceLayer",
@@ -38,48 +39,6 @@ var map, navToolbar, geocoder;
 
       map.addLayer(dynamicMapServiceLayer);
 
-      // map.on("load", createToolbar);
-      //
-      // // loop through all dijits, connect onClick event listeners for buttons to activate navigation tools
-      // registry.forEach(function(d) {
-      //   // d is a reference to a dijit, could be a layout container or a button
-      //   if (d.declaredClass === "dijit.form.Button") {
-      //     d.on("click", activateTool);
-      //   }
-      // });
-      //
-      // // activate tools
-      // function activateTool() {
-      //   var tool = this.label.toUpperCase().replace(/ /g, "_");
-      //   switch(tool) {
-      //     case "ZOOM_IN":
-      //     case "ZOOM_OUT":
-      //     case "PAN":
-      //       navToolbar.activate(Navigation[tool]);
-      //       break;
-      //     case "FULL_EXTENT":
-      //       navToolbar.zoomToFullExtent();
-      //       break;
-      //     case "PREV_EXTENT":
-      //       navToolbar.zoomToPrevExtent();
-      //       break;
-      //     case "NEXT_EXTENT":
-      //       navToolbar.zoomToNextExtent();
-      //       break;
-      //     case "DEACTIVATE":
-      //       navToolbar.deactivate();
-      //       break;
-      //     default:
-      //       break;
-      //   }
-      //   console.log(Navigation[tool]);
-      // }
-      //
-      // // create the Navigation toolbar
-      // function createToolbar(themap) {
-      //   navToolbar = new Navigation(map);
-      // }
-
       navToolbar = new Navigation(map);
        on(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
 
@@ -117,15 +76,43 @@ var map, navToolbar, geocoder;
        }
 
       var sources = [
-        {
+          {
+            featureLayer: new FeatureLayer("http://apollo/ArcGIS/rest/services/FireExplorer/MapServer/3"),
+            searchFields: ["AssetID"],
+            exactMatch: true,
+            outFields: ["*"],
+            name: "Hydrant ID Query",
+            //labelSymbol: textSymbol,
+            placeholder: "Hydrant ID",
+            //prefix: "HY",
+            //maxResults: 6,
+            //maxSuggestions: 6,
+            //enableSuggestions: true,
+            //minCharacters: 0
+          },
+          {
           featureLayer: new FeatureLayer("http://apollo/ArcGIS/rest/services/FireExplorer/MapServer/13"),
           searchFields: ["Tag"],
           //suggestionTemplate: "Grid: ${Tag}",
           exactMatch: true,
           outFields: ["*"],
-          name: "City Grid",
-          //labelSymbol: textSymbol,
+          name: "City Grid Query",
+          //labelSymbol:  textSymbol,
           placeholder: "City Grid",
+          //maxResults: 6,
+          //maxSuggestions: 6,
+          //enableSuggestions: true,
+          //minCharacters: 0
+        },
+        {
+          featureLayer: new FeatureLayer("https://gisimages.greensboro-nc.gov/prod/rest/services/GISDivision/GsoGeoService/MapServer/5"),
+          searchFields: ["REPORT"],
+          exactMatch: true,
+          outFields: ["*"],
+          name: "FZD Query",
+          //labelSymbol: textSymbol,
+          placeholder: "FZD",
+          //prefix: "HY",
           //maxResults: 6,
           //maxSuggestions: 6,
           //enableSuggestions: true,
@@ -137,20 +124,19 @@ var map, navToolbar, geocoder;
         map: map,
         sources: sources,
         //enableSuggestions: true,
+        enableHighlight: false,
         zoomScale: 10000,
-        showInfoWindowOnSelect: false,
-        enableButtonMode: true
-      },"gridSearch");
+        showInfoWindowOnSelect: false
+        //enableButtonMode: true
+      },"featureSearch");
       s.startup();
 
        var geocoders = [{
-        //url: "http://xanthus:6080/prod/rest/services/Geocoding/AllPoints/GeocodeServer",
+        url: "https://gisimages.greensboro-nc.gov/prod/rest/services/Geocoding/AllPoints/GeocodeServer",
         //url: "http://apollo/ArcGIS/rest/services/Geocoding/AllPoints/GeocodeServer",
-        url: "http://xanthus:6080/arcgis/rest/services/Geocoding/AddressPoints/GeocodeServer",
+        //url: "https://gisimages.greensboro-nc.gov/prod/rest/services/Geocoding/AddressPoints/GeocodeServer",
         name: "All Points",
-         placeholder: "Address Search",
-        // singleLineFieldName: "Single Line Input",
-        // categories: ["airports"]
+         placeholder: "Address Search"
       }];
 
        var geocoder = new Geocoder( {
@@ -163,37 +149,40 @@ var map, navToolbar, geocoder;
        },"search");
        geocoder.startup();
 
-    //    geocoder.on("find-results", function(response) {
-    //      console.log(response);
-    //      $.ajax({
-    //       url: "http://helen/GsoGeoService/api/PointInPoly?x=" + response.results.results[0].feature.geometry.x + "&y=" + response.results.results[0].feature.geometry.y + "&l=5",
-    //       success: function(result) {
-    //         console.log(result);
-    //         $("#agencyResult").html("AGENCY:   " + result[0].value);
-    //         $("#districtResult").html("DISTRICT:  " + result[1].value);
-    //         $("#reportResult").html("REPORT:   " + result[2].value);
-    //         $("#responseResult").html("RESPONSE: " + result[3].value);
-    //       }
-     //
-    //    });
-    //  });
-
      geocoder.on("select", function(response) {
        console.log(response);
        $.ajax({
         url: "http://helen/GsoGeoService/api/PointInPoly?x=" + response.result.feature.geometry.x + "&y=" + response.result.feature.geometry.y + "&l=5",
         success: function(result) {
-          console.log(result);
+          //console.log(result);
+          $(".drillStationResults").hide();
           $("#agencyResult").html("AGENCY:   " + result[0].value);
           $("#districtResult").html("DISTRICT:  " + result[1].value);
           $("#reportResult").html("REPORT:   " + result[2].value);
           $("#responseResult").html("RESPONSE: " + result[3].value);
+          $("#stationsToggle").html("Toggle Stations")
+          $("#st1").html("ST1: " + result[4].value);
+          $("#st2").html("ST2: " + result[5].value);
+          $("#st3").html("ST3: " + result[6].value);
+          $("#st4").html("ST4: " + result[7].value);
+          $("#st5").html("ST5: " + result[8].value);
+          $("#st6").html("ST6: " + result[9].value);
+          $("#st7").html("ST7: " + result[10].value);
+          $("#st8").html("ST8: " + result[11].value);
+          $("#st9").html("ST9: " + result[12].value);
+          $("#st10").html("ST10: " + result[13].value);
         }
-
      });
    });
 
      geocoder.on("clear", function(response) {
        $(".drillDownResults").html("");
      });
+
+     //Toggles the closest station data in the Fire Drill Down info.
+     $("#stationsToggle").click(function(){
+         $(".drillStationResults").toggle();
+     });
+
+
 });

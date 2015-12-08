@@ -34,6 +34,23 @@ a:active {
     height: 100%;
 }
 
+.resultsLists {
+    list-style-type: none;
+}
+
+#stationsToggle {
+  color: blue;
+  text-decoration: underline;
+}
+
+/*#stationsList {
+  visibility: hidden;
+}*/
+
+.drillDownResults {
+  margin: 3px;
+}
+
 #LayerListContainer {
   padding: 0;
   margin: 0;
@@ -47,10 +64,17 @@ a:active {
   background-color: red;
 }
 
-#toolWidgets {
+#featureSearch {
+  position: absolute;
+  left: 20px;
+  top: 87px;
+  z-index: 3;
+}
+
+/*#toolWidgets {
   margin: 5px 0 0 20px;
   float: left;
-}
+}*/
 
 #navButtons {
   margin-right: 20px;
