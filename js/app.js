@@ -1,8 +1,12 @@
-var map, navToolbar, geocoder;
-
+var map, toc, navToolbar, geocoder;
 
   require([
+    "dojo/_base/connect",
+    "dojo/dom",
+    "dojo/_base/Color",
     "esri/map",
+    "esri/geometry/Extent",
+    "agsjs/dijit/TOC",
     "esri/layers/ArcGISDynamicMapServiceLayer",
     "esri/layers/ImageParameters",
     "esri/toolbars/navigation",
@@ -16,11 +20,12 @@ var map, navToolbar, geocoder;
     "dijit/TitlePane",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
+    "dojo/fx",
     "dijit/form/Button",
     "dijit/layout/AccordionContainer",
     "dijit/layout/AccordionPane",
     "dojo/domReady!"
-  ], function (Map, ArcGISDynamicMapServiceLayer, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer) {
+  ], function (connect, dom, Color, Map, Extent, TOC, ArcGISDynamicMapServiceLayer, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer) {
 
       parser.parse();
 
@@ -32,12 +37,34 @@ var map, navToolbar, geocoder;
       imageParameters.format = "jpeg"; //set the image type to PNG24, note default is PNG8.
 
       //Takes a URL to a non cached map service.
-      var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://apollo/ArcGIS/rest/services/FireExplorer/MapServer", {
+      var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer", {
         "opacity" : 1.0,
         "imageParameters" : imageParameters
       });
 
-      map.addLayer(dynamicMapServiceLayer);
+      map.addLayers([dynamicMapServiceLayer]);
+
+      //Table of Contents Wigit.
+      map.on('layers-add-result', function(evt) {
+          // overwrite the default visibility of service.
+          // TOC will honor the overwritten value
+          //dynamicMapServiceLayer.setVisibleLayers([2, 5, 8, 11]);
+          try {
+              toc = new TOC({
+              map: map,
+              layerInfos: [{
+                layer: dynamicMapServiceLayer,
+                title: "Fire Explorer Layers"
+                //collapsed: false, // whether this root layer should be collapsed initially, default false.
+                //slider: false // whether to display a transparency slider.
+              }]
+            }, 'tocDiv');
+            toc.startup();
+          }
+          catch(err) {
+             console.error(err.message);
+          }
+      });
 
       navToolbar = new Navigation(map);
        on(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
@@ -77,7 +104,7 @@ var map, navToolbar, geocoder;
 
       var sources = [
           {
-            featureLayer: new FeatureLayer("http://apollo/ArcGIS/rest/services/FireExplorer/MapServer/3"),
+            featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/3"),
             searchFields: ["AssetID"],
             exactMatch: true,
             outFields: ["*"],
@@ -91,7 +118,7 @@ var map, navToolbar, geocoder;
             //minCharacters: 0
           },
           {
-          featureLayer: new FeatureLayer("http://apollo/ArcGIS/rest/services/FireExplorer/MapServer/13"),
+          featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/12"),
           searchFields: ["Tag"],
           //suggestionTemplate: "Grid: ${Tag}",
           exactMatch: true,
@@ -115,21 +142,21 @@ var map, navToolbar, geocoder;
           //prefix: "HY",
           //maxResults: 6,
           //maxSuggestions: 6,
-          //enableSuggestions: true,
+          enableSuggestions: true,
           //minCharacters: 0
         }
       ];
 
-      var s = new Search({
+      var searchItem = new Search({
         map: map,
         sources: sources,
-        //enableSuggestions: true,
-        enableHighlight: false,
-        zoomScale: 10000,
+        enableSuggestions: true,
+        enableHighlight: true,
+        zoomScale: 5000,
         showInfoWindowOnSelect: false
         //enableButtonMode: true
       },"featureSearch");
-      s.startup();
+      searchItem.startup();
 
        var geocoders = [{
         url: "https://gisimages.greensboro-nc.gov/prod/rest/services/Geocoding/AllPoints/GeocodeServer",
@@ -152,7 +179,7 @@ var map, navToolbar, geocoder;
      geocoder.on("select", function(response) {
        console.log(response);
        $.ajax({
-        url: "http://helen/GsoGeoService/api/PointInPoly?x=" + response.result.feature.geometry.x + "&y=" + response.result.feature.geometry.y + "&l=5",
+        url: "http://gisimages.greensboro-nc.gov/GsoGeoService/api/PointInPoly?x=" + response.result.feature.geometry.x + "&y=" + response.result.feature.geometry.y + "&l=5",
         success: function(result) {
           //console.log(result);
           $(".drillStationResults").hide();

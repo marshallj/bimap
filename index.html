@@ -5,11 +5,23 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <!--The viewport meta tag is used to improve the presentation and behavior of the samples
       on iOS devices-->
-  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
-  <link rel="stylesheet" href="http://js.arcgis.com/3.14/dijit/themes/claro/claro.css">
-  <link rel="stylesheet" href="http://js.arcgis.com/3.14/esri/css/esri.css">
-  <link rel="stylesheet" href="styles/style.css">
-  <script src="http://js.arcgis.com/3.14/"></script>
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+
+<script type="text/javascript">
+  var dojoConfig = {
+    parseOnLoad: false,
+    paths: {
+      //if you want to host on your own server, download and put in folders then use path like:
+            agsjs: location.pathname.replace(/\/[^/]+$/, '') + '/../src/agsjs'
+        }
+  };
+</script>
+
+  <link rel="stylesheet" href="http://js.arcgis.com/3.15/dijit/themes/claro/claro.css"/>
+  <link rel="stylesheet" href="http://js.arcgis.com/3.15/esri/css/esri.css"/>
+  <link rel="stylesheet" href="src/agsjs/css/agsjs.css"/>
+  <link rel="stylesheet" href="styles/style.css"/>
+  <script src="http://js.arcgis.com/3.15/"></script>
   <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
   <script src="js/app.js"></script>
 </head>
@@ -72,7 +84,8 @@
       </div>
       <div id="tpFlowTest" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Hydrant Flow Test Info'" open=false></div>
       <div id="tpPlotIncidents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Plot Incidents'" open=false></div>
-      <div id="tpMapContents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Map Contents'" open=true></div>
+      <div id="tpMapContents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Map Contents'" open=true><div id="tocDiv"></div></div>
+
     </div>
 
     <!-- <div data-dojo-type="dijit/layout/AccordionContainer" data-dojo-props="minSize:50, region:'leading', splitter:true" style="width: 300px;" id="leftAccordion">

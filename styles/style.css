@@ -59,9 +59,12 @@ a:active {
   float: left;
 }
 
+#header {
+  background-color: darkred;
+}
+
 #toolbar {
   height: 45px;
-  background-color: red;
 }
 
 #featureSearch {
