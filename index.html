@@ -26,9 +26,6 @@
   <script src="js/app.js"></script>
 </head>
 <body class="claro">
-  <!-- <div id="LayerListContainer">
-    <div id="LayerList"></div>
-  </div> -->
 
   <div id="featureSearch"></div>
   <div id="borderContainer" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="gutters:true, liveSplitters:true" >
@@ -38,12 +35,9 @@
           <a href="http://centralstation/" target="_blank">Central Station</a> | <a href="http://xanthus/HydrantMapper/" target="_blank">Hydrant Mapper</a> | <a href="http://gisimages.greensboro-nc.gov/GSOMapGallery/" target="_blank">GIS Map Gallery</a>
         </p>
       </div>
-      <h2 id="title">City of Greensboro - Fire Explorer</h2>
+      <h2 id="title">City of Greensboro - Fire Explorer - BETA</h2>
 
       <div id="toolbar">
-        <!-- <div id="toolWidgets">
-          <div id="featureSearch"></div>
-        </div> -->
         <div id="navButtons">
           <button id="zoomin" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoominIcon"></button>
           <button id="zoomout" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomoutIcon"></button>
@@ -53,7 +47,6 @@
           <button id="pan" class="navButton" data-dojo-type="dijit/form/Button" iconClass="panIcon"></button>
           <button id="deactivate" class="navButton" data-dojo-type="dijit/form/Button" iconClass="deactivateIcon"></button>
         </div>
-
       </div>
     </div>
     <div id="leftPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="minSize:50, region:'leading', splitter:true" style="width: 300px;">
@@ -67,7 +60,6 @@
 
         <div id="closestStations">
           <a id="stationsToggle" class="drillDownResults"></a>
-          <!-- <button id="stationsButton">Toggle Stations</button> -->
           <ul id="stationsList" class="resultsLists">
             <li id="st1" class="drillStationResults"></li>
             <li id="st2" class="drillStationResults"></li>

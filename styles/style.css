@@ -95,6 +95,10 @@ a:active {
     height:100%;
 }
 
+#stationsToggle {
+  cursor: pointer;
+}
+
 .navButton {
   width: 16px;
   height: 16px;
