@@ -24,6 +24,8 @@
     "esri/dijit/Popup",
     "dojo/_base/array",
     "dojo/dom-construct",
+    "esri/dijit/LayerList",
+    "dojo/query",
     "dijit/TitlePane",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
@@ -33,7 +35,7 @@
     "dijit/layout/AccordionPane",
     "dojo/domReady!"
   ], function (connect, dom, Color, Map, Extent, TOC, ArcGISDynamicMapServiceLayer, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
-        SimpleLineSymbol, SimpleMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, arrayUtils, domConstruct) {
+        SimpleLineSymbol, SimpleMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, arrayUtils, domConstruct, LayerList, query) {
 
       var map, toc, navToolbar, geocoder, identifyTask, identifyParams, hydrantID;
 
@@ -61,6 +63,25 @@
       map.addLayers([dynamicMapServiceLayer]);
 
       map.on("load", mapReady);
+
+      var layerList = new LayerList({
+      map: map,
+      showLegend: false,
+      showSubLayers: true,
+      showOpacitySlider: true,
+      layers: [{
+        layer: dynamicMapServiceLayer, // required unless featureCollection.
+      //  featureCollection: featureCollection, // required unless layerObject. If the layer is a feature collection, should match AGOL feature collection response and not have a layerObject.
+       showSubLayers: true, // optional, show sublayers for this layer. Defaults to the widget's 'showSubLayers' property.
+       showLegend: false, // optional, display a legend for the layer items.
+       //content: , // optional, custom node to insert content. It appears below the title.
+       showOpacitySlider: true, // optional, display the opacity slider for layer items.
+       //button: , // optional, custom button node that will appear within the layer title.
+       visibility: true, // optionally set the default visibility
+       id: "Fire Explorer Layers" // optionally set the layer's id
+      }]
+    },"layerListDom");
+    layerList.startup();
 
       // map.addLayer(new ArcGISDynamicMapServiceLayer(fireExplorerURL,
       //   { opacity: 0.55 }));
@@ -90,7 +111,7 @@ function mapReady () {
         // response is an array of identify result objects
         // Let's return an array of features.
         return arrayUtils.map(response, function (result) {
-          //console.log(result);
+          console.log("Result: " + JSON.stringify(result));
           var feature = result.feature;
           var layerName = result.layerName;
           var attributes = feature.attributes;
@@ -102,15 +123,17 @@ function mapReady () {
             //var hydrantFlowData = getHydrantFlowData(hydrantID);
 
             getHydrantFlowData(function(result) {
-              console.log(result);
+              console.log("AJAX Result: " + result);
               var hydrantFlowContent = JSON.parse(result);
-              console.log(hydrantFlowContent);
+              console.log("HydrantFlowJSON: " + JSON.stringify(hydrantFlowContent));
               var table, tableData;
-              table = "<table>";
+              table = "<table id='hydFlowTable'>";
               table += "<tr><th>Date</th><th>Static</th><th>Residual</th><th>Pitot</th><th>GPM</th><th>@20</th><th>@10</th><th>@0</th></tr>";
               for (var i = 0; i < hydrantFlowContent.features.length; i++) {
+                  var date = new Date(hydrantFlowContent.features[i].attributes.date);
                   tableData = '<tr>';
-                  tableData += "<td>" + hydrantFlowContent.features[i].attributes.date + "</td>";
+                  // tableData += "<td>" + hydrantFlowContent.features[i].attributes.date + "</td>";
+                  tableData += "<td>" + date.toLocaleDateString() + "</td>";
                   tableData += "<td>" + hydrantFlowContent.features[i].attributes.static + "</td>";
                   tableData += "<td>" + hydrantFlowContent.features[i].attributes.residual + "</td>";
                   tableData += "<td>" + hydrantFlowContent.features[i].attributes.pitot + "</td>";
@@ -121,19 +144,27 @@ function mapReady () {
                   table += tableData + "</tr>";
               }
               table += "</table>";
-              //var infoTemplateContent = "Hydrant ID: ${Hydrant ID} <br/> Main Size: ${Main Size} <br/>" + table;
-              console.log(infoTemplateContent);
-              var hydrantTemplate = new InfoTemplate();
-              hydrantTemplate.setTitle("Hydrants");
-              hydrantTemplate.setContent(infoTemplateContent);
-              console.log(hydrantTemplate);
+              var infoTemplateContent = "<strong>Hydrant ID:</strong> ${Hydrant ID} <br/> <strong>Main Size:</strong> ${Main Size} <br/> <strong>Hydrant Flow Data:</strong> <br/>" + table;
+              console.log("Table: " + table);
+              var hydrantTemplate = new InfoTemplate("Hydrants", infoTemplateContent);
+              //hydrantTemplate.setTitle("Hydrants");
+              //hydrantTemplate.setContent(infoTemplateContent);
+              console.log("InfoTemplate: " + JSON.stringify(hydrantTemplate));
               feature.setInfoTemplate(hydrantTemplate);
+              // var infoWinWidth = $("#hydFlowTable").width();
+              // console.log(infoWinWidth);
+              map.infoWindow.resize(450, 200);
+              map.infoWindow.setFeatures([deferred]);
+              map.infoWindow.show(event.mapPoint);
             });
           }
           else if (layerName === 'Streets') {
             //console.log(feature.attributes.PARCELID);
             var streetsTemplate = new InfoTemplate("Street", "Street: ${STREET}");
             feature.setInfoTemplate(streetsTemplate);
+
+            map.infoWindow.setFeatures([deferred]);
+            map.infoWindow.show(event.mapPoint);
           }
           return feature;
         });
@@ -144,8 +175,9 @@ function mapReady () {
       // above is not an array of features, then you need to add a callback
       // like the one above to post-process the response and return an
       // array of features.
-      map.infoWindow.setFeatures([deferred]);
-      map.infoWindow.show(event.mapPoint);
+      /******************  Fix AJAX *****************/
+      //map.infoWindow.setFeatures([deferred]);
+      //map.infoWindow.show(event.mapPoint);
     }
 
       var imageParameters = new ImageParameters();
@@ -266,12 +298,72 @@ function mapReady () {
         map: map,
         sources: itemSources,
         //enableSuggestions: true,
-        enableHighlight: true,
+        enableHighlight: false,
+        allPlaceholder: "Search All",
         zoomScale: 5000,
         showInfoWindowOnSelect: false
         //enableButtonMode: true
       },"featureSearch");
       searchItem.startup();
+
+
+      searchItem.on("search-results", function(e) {
+        if (searchItem.activeSource.name == "Hydrant ID Query") {
+          console.log(searchItem.activeSource);
+          var x = dynamicMapServiceLayer.layerInfos
+          console.log(x);
+          if (dynamicMapServiceLayer.layerInfos[3].visible == false) {
+            //dynamicMapServiceLayer.layerInfos[3].visible = true;
+            var inputs = query(".agsjsTOCNode input[type='checkbox']");
+            console.log(inputs);
+            var visible = [3];
+            for (var i = 1; i < inputs.length; i++) {
+              if (inputs[i].checked) {
+                visible.push(i - 1);
+              }
+            }
+            console.log(visible);
+            dynamicMapServiceLayer.setVisibleLayers(visible);
+          }
+        }
+        else if (searchItem.activeSource.name == "City Grid Query") {
+          console.log(searchItem.activeSource);
+          var x = dynamicMapServiceLayer.layerInfos
+          console.log(x);
+          if (dynamicMapServiceLayer.layerInfos[12].visible == false) {
+            //dynamicMapServiceLayer.layerInfos[3].visible = true;
+            var inputs = query(".agsjsTOCNode input[type='checkbox']");
+            console.log(inputs);
+            var visible = [12];
+            for (var i = 1; i < inputs.length; i++) {
+              if (inputs[i].checked) {
+                visible.push(i - 1);
+              }
+            }
+            console.log(visible);
+            dynamicMapServiceLayer.setVisibleLayers(visible);
+          }
+        }
+        else if (searchItem.activeSource.name == "FZD Query") {
+          console.log(searchItem.activeSource);
+          var x = dynamicMapServiceLayer.layerInfos
+          console.log(x);
+          if (dynamicMapServiceLayer.layerInfos[13].visible == false) {
+            //dynamicMapServiceLayer.layerInfos[3].visible = true;
+            var inputs = query(".agsjsTOCNode input[type='checkbox']");
+            console.log(inputs);
+            var visible = [13];
+            for (var i = 1; i < inputs.length; i++) {
+              if (inputs[i].checked) {
+                visible.push(i - 1);
+              }
+            }
+            console.log(visible);
+            dynamicMapServiceLayer.setVisibleLayers(visible);
+          }
+        }
+      });
+
 
       // var addressSources = [
       //     {
@@ -359,7 +451,6 @@ http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/33/query?
    return $.ajax({
       type: "GET",
       url: "http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/33/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
-
       success: callback// function(result) {
       //   var hydrantFlowTests = JSON.parse(result);
       //   //console.log(hydrantFlowTests);

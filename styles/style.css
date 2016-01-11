@@ -22,7 +22,7 @@ a:visited {
 }
 
 a:hover {
-    color: #f00;
+    color: #aaa;
 }
 
 a:active {
@@ -74,11 +74,6 @@ a:active {
   z-index: 3;
 }
 
-/*#toolWidgets {
-  margin: 5px 0 0 20px;
-  float: left;
-}*/
-
 #navButtons {
   margin-right: 20px;
   float: right;
@@ -99,50 +94,88 @@ a:active {
   cursor: pointer;
 }
 
+
+
+.claro .dijitButton .dijitButtonNode {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/*.dijitButtonNode {
+  background-color: red;
+}*/
+
+ /*.claro .dijitDropDownButton .dijitButtonNode, .claro .dijitComboButton .dijitButtonNode, */
+
+ /*.claro .dijitToggleButton .dijitButtonNode {
+   background-color: red;
+ }*/
+
 .navButton {
   width: 16px;
   height: 16px;
   margin: 12px;
 }
 
-.zoominIcon {
- background-image: url("../images/nav_zoomin.png");
- width: 16px;
- height: 16px;
+.icon {
+  width: 32px;
+  height: 32px;
 }
 
-.zoomoutIcon {
- background-image: url("../images/nav_zoomout.png");
- width: 16px;
- height: 16px;
+#zoomin {
+ background-image: url("../images/zoom-in-4x.png");
+ background-repeat: no-repeat;
 }
 
-.zoomfullextIcon {
- background-image: url("../images/nav_fullextent.png");
- width: 16px;
- height: 16px;
+#zoomout {
+ background-image: url("../images/zoom-out-4x.png");
+ background-repeat: no-repeat;
 }
 
-.zoomprevIcon {
- background-image: url("../images/nav_previous.png");
- width: 16px;
- height: 16px;
+#zoomfullext {
+ background-image: url("../images/globe-4x.png");
+ background-repeat: no-repeat;
 }
 
-.zoomnextIcon {
- background-image: url("../images/nav_next.png");
- width: 16px;
- height: 16px;
+#zoomprev {
+ background-image: url("../images/chevron-left-4x.png");
+ background-repeat: no-repeat;
 }
 
-.panIcon {
- background-image: url("../images/nav_pan.png");
- width: 16px;
- height: 16px;
+#zoomnext {
+ background-image: url("../images/chevron-right-4x.png");
+ background-repeat: no-repeat;
 }
 
-.deactivateIcon {
- background-image: url("../images/nav_decline.png");
- width: 16px;
- height: 16px;
+#pan {
+ background-image: url("../images/move-4x.png");
+ background-repeat: no-repeat;
+}
+
+#deactivate {
+ background-image: url("../images/x-4x.png");
+ background-repeat: no-repeat;
+}
+
+/* Collapse into a single border */
+table {
+    border-collapse: collapse;
+    margin: 5px;
+}
+
+table, th, td {
+   border: 1px solid black;
+}
+
+/* Place padding around content */
+th, td {
+    padding: 0px 5px;
+    text-align: left;
+}
+
+th {
+  background-color: #aaa;
 }

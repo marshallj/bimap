@@ -39,13 +39,13 @@
 
       <div id="toolbar">
         <div id="navButtons">
-          <button id="zoomin" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoominIcon"></button>
-          <button id="zoomout" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomoutIcon"></button>
-          <button id="zoomfullext" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomfullextIcon"></button>
-          <button id="zoomprev" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomprevIcon"></button>
-          <button id="zoomnext" class="navButton" data-dojo-type="dijit/form/Button" iconClass="zoomnextIcon"></button>
-          <button id="pan" class="navButton" data-dojo-type="dijit/form/Button" iconClass="panIcon"></button>
-          <button id="deactivate" class="navButton" data-dojo-type="dijit/form/Button" iconClass="deactivateIcon"></button>
+          <button id="zoomin" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+          <button id="zoomout" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+          <button id="zoomfullext" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+          <button id="zoomprev" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+          <button id="zoomnext" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+          <button id="pan" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+          <button id="deactivate" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
         </div>
       </div>
     </div>
@@ -74,10 +74,10 @@
           </ul>
         </div>
       </div>
-      <div id="tpFlowTest" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Hydrant Flow Test Info'" open=false></div>
-      <div id="tpPlotIncidents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Plot Incidents'" open=false></div>
+      <!-- <div id="tpFlowTest" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Hydrant Flow Test Info'" open=false></div> -->
+      <div id="tpPlotIncidents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Plot Incidents'" open=false>This tool is in development.</div>
       <div id="tpMapContents" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Map Contents'" open=true><div id="tocDiv"></div></div>
-
+      <div id="tpMapContents2" data-dojo-type="dijit/TitlePane" data-dojo-props="title: 'Map Contents2'" open=true><div id="layerListDom"></div></div>
     </div>
 
     <!-- <div data-dojo-type="dijit/layout/AccordionContainer" data-dojo-props="minSize:50, region:'leading', splitter:true" style="width: 300px;" id="leftAccordion">
@@ -97,6 +97,7 @@
 
     <div id="mapDiv" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
       <div id="search"></div>
+      <!-- <div id="layerListDom"></div> -->
     </div>
   </div>
 </body>
