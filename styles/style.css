@@ -6,23 +6,37 @@ html, body {
   font-family: "Trebuchet MS";
 }
 
+#title {
+  color: #E4CBB5;
+}
+
+#gfdPatch {
+  float: left;
+}
+
 #fireLinks {
   float: right;
   font-size: 1.1em;
 }
 
+*:focus {
+    outline: none;
+}
+
 a:link {
     text-decoration: none;
-    color: #000;
+    /*color: #aaa;*/
+    color: #ddd;
 }
 
 a:visited {
     text-decoration: none;
-    color: #000;
+    /*color: #aaa;*/
+    color: #ddd;
 }
 
 a:hover {
-    color: #aaa;
+    color: #E4CBB5;
 }
 
 a:active {
@@ -61,6 +75,10 @@ a:active {
 
 #header {
   background-color: darkred;
+  background-size: 110% 100%;
+  background-image: url("../images/TitleBanner.png");
+  background-repeat: no-repeat;
+  /*background-size: cover;*/
 }
 
 #toolbar {
@@ -69,9 +87,9 @@ a:active {
 
 #featureSearch {
   position: absolute;
-  left: 20px;
-  top: 87px;
-  z-index: 3;
+  left: 85px;
+  top: 90px;
+  z-index: 1000;
 }
 
 #navButtons {
@@ -94,8 +112,6 @@ a:active {
   cursor: pointer;
 }
 
-
-
 .claro .dijitButton .dijitButtonNode {
   background-color: transparent !important;
   background-image: none !important;
@@ -103,16 +119,6 @@ a:active {
   box-shadow: none !important;
   border-radius: 0 !important;
 }
-
-/*.dijitButtonNode {
-  background-color: red;
-}*/
-
- /*.claro .dijitDropDownButton .dijitButtonNode, .claro .dijitComboButton .dijitButtonNode, */
-
- /*.claro .dijitToggleButton .dijitButtonNode {
-   background-color: red;
- }*/
 
 .navButton {
   width: 16px;
@@ -126,38 +132,62 @@ a:active {
 }
 
 #zoomin {
- background-image: url("../images/zoom-in-4x.png");
+ background-image: url("../images/ZoomIn.png");
  background-repeat: no-repeat;
 }
 
+#zoomin:hover {
+
+}
+
+/*#zoomin:focus {
+  background-image: url("../images/ZoomInSelect.png");
+}*/
+
 #zoomout {
- background-image: url("../images/zoom-out-4x.png");
+ background-image: url("../images/ZoomOut.png");
  background-repeat: no-repeat;
 }
 
 #zoomfullext {
- background-image: url("../images/globe-4x.png");
+ background-image: url("../images/ZoomFull.png");
  background-repeat: no-repeat;
+}
+
+#zoomfullext:hover {
+ background-image: url("../images/ZoomFullHighlight.png");
 }
 
 #zoomprev {
- background-image: url("../images/chevron-left-4x.png");
+ background-image: url("../images/PrevExtent.png");
  background-repeat: no-repeat;
+}
+
+#zoomprev:hover {
+  background-image: url("../images/PrevExtentHighlight.png");
 }
 
 #zoomnext {
- background-image: url("../images/chevron-right-4x.png");
+ background-image: url("../images/NextExtent.png");
  background-repeat: no-repeat;
 }
 
+#zoomnext:hover {
+  background-image: url("../images/NextExtentHighlight.png");
+}
+
 #pan {
- background-image: url("../images/move-4x.png");
+ background-image: url("../images/Pan.png");
  background-repeat: no-repeat;
 }
 
 #deactivate {
- background-image: url("../images/x-4x.png");
+ background-image: url("../images/Clear.png");
  background-repeat: no-repeat;
+}
+
+#deactivate:hover {
+ background-image: url("../images/ClearHighlight.png");
 }
 
 /* Collapse into a single border */

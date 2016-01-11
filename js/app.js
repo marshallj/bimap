@@ -44,10 +44,12 @@
       var popup = new Popup({
         fillSymbol: new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
           new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-            new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.25]))
-          //   , markerSymbol: new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_SQUARE, 10,
-          // new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-          //     new Color([255,0,0]), 1),new Color([0,255,0,0.25]))
+            new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.25])),
+        lineSymbol: new SimpleLineSymbol(
+          SimpleLineSymbol.STYLE_SOLID, new Color([255,0,0]), 3),
+        markerSymbol: new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_SQUARE, 10,
+          new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+            new Color([255,0,0]), 1), new Color([0,255,0,0.25]))
       }, domConstruct.create("div"));
 
       map = new Map("mapDiv", {
@@ -64,28 +66,6 @@
 
       map.on("load", mapReady);
 
-      var layerList = new LayerList({
-      map: map,
-      showLegend: false,
-      showSubLayers: true,
-      showOpacitySlider: true,
-      layers: [{
-        layer: dynamicMapServiceLayer, // required unless featureCollection.
-      //  featureCollection: featureCollection, // required unless layerObject. If the layer is a feature collection, should match AGOL feature collection response and not have a layerObject.
-       showSubLayers: true, // optional, show sublayers for this layer. Defaults to the widget's 'showSubLayers' property.
-       showLegend: false, // optional, display a legend for the layer items.
-       //content: , // optional, custom node to insert content. It appears below the title.
-       showOpacitySlider: true, // optional, display the opacity slider for layer items.
-       //button: , // optional, custom button node that will appear within the layer title.
-       visibility: true, // optionally set the default visibility
-       id: "Fire Explorer Layers" // optionally set the layer's id
-      }]
-    },"layerListDom");
-    layerList.startup();
-
-      // map.addLayer(new ArcGISDynamicMapServiceLayer(fireExplorerURL,
-      //   { opacity: 0.55 }));
-
 function mapReady () {
     map.on("click", executeIdentifyTask);
     //create identify tasks and setup parameters
@@ -94,7 +74,7 @@ function mapReady () {
     identifyParams = new IdentifyParameters();
     identifyParams.tolerance = 5;
     identifyParams.returnGeometry = true;
-    identifyParams.layerIds = [3, 10];
+    identifyParams.layerIds = [1, 3, 10, 12];
     identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_VISIBLE;
     identifyParams.width = map.width;
     identifyParams.height = map.height;
@@ -116,11 +96,9 @@ function mapReady () {
           var layerName = result.layerName;
           var attributes = feature.attributes;
 
-          //feature.attributes.layerName = layerName;
           if (layerName === 'Hydrants') {
             hydrantID = attributes["Hydrant ID"];
             //console.log(hydrantID);
-            //var hydrantFlowData = getHydrantFlowData(hydrantID);
 
             getHydrantFlowData(function(result) {
               console.log("AJAX Result: " + result);
@@ -147,19 +125,17 @@ function mapReady () {
               var infoTemplateContent = "<strong>Hydrant ID:</strong> ${Hydrant ID} <br/> <strong>Main Size:</strong> ${Main Size} <br/> <strong>Hydrant Flow Data:</strong> <br/>" + table;
               console.log("Table: " + table);
               var hydrantTemplate = new InfoTemplate("Hydrants", infoTemplateContent);
-              //hydrantTemplate.setTitle("Hydrants");
-              //hydrantTemplate.setContent(infoTemplateContent);
+
               console.log("InfoTemplate: " + JSON.stringify(hydrantTemplate));
               feature.setInfoTemplate(hydrantTemplate);
-              // var infoWinWidth = $("#hydFlowTable").width();
-              // console.log(infoWinWidth);
+
               map.infoWindow.resize(450, 200);
               map.infoWindow.setFeatures([deferred]);
               map.infoWindow.show(event.mapPoint);
             });
           }
           else if (layerName === 'Streets') {
-            //console.log(feature.attributes.PARCELID);
+
             var streetsTemplate = new InfoTemplate("Street", "Street: ${STREET}");
             feature.setInfoTemplate(streetsTemplate);
 
@@ -169,29 +145,14 @@ function mapReady () {
           return feature;
         });
       });
-
-      // InfoWindow expects an array of features from each deferred
-      // object that you pass. If the response from the task execution
-      // above is not an array of features, then you need to add a callback
-      // like the one above to post-process the response and return an
-      // array of features.
-      /******************  Fix AJAX *****************/
-      //map.infoWindow.setFeatures([deferred]);
-      //map.infoWindow.show(event.mapPoint);
     }
 
       var imageParameters = new ImageParameters();
       imageParameters.format = "jpeg"; //set the image type to PNG24, note default is PNG8.
 
-      //Takes a URL to a non cached map service.
-      // var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer", {
-      //   "opacity" : 1.0,
-      //   "imageParameters" : imageParameters
-      // });
-      //
-      // map.addLayers([dynamicMapServiceLayer]);
-
-      //Table of Contents Wigit.
+      /*******************************************************************/
+      /*************************** TOC Widget ****************************/
+      /*******************************************************************/
       map.on('layers-add-result', function(evt) {
           // overwrite the default visibility of service.
           // TOC will honor the overwritten value
@@ -203,7 +164,7 @@ function mapReady () {
                 layer: dynamicMapServiceLayer,
                 title: "Fire Explorer Layers"
                 //collapsed: false, // whether this root layer should be collapsed initially, default false.
-                //slider: false // whether to display a transparency slider.
+                //slider: true // whether to display a transparency slider.
               }]
             }, 'tocDiv');
             toc.startup();
@@ -212,16 +173,28 @@ function mapReady () {
              console.error(err.message);
           }
       });
+      /*******************************************************************/
+      /*********************** END - TOC Widget **************************/
+      /*******************************************************************/
 
+      /*******************************************************************/
+      /********************** NAVIGATION TOOLBAR *************************/
+      /*******************************************************************/
       navToolbar = new Navigation(map);
        on(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
 
        registry.byId("zoomin").on("click", function () {
          navToolbar.activate(Navigation.ZOOM_IN);
+         $("#zoomin").css("background-image", "url('images/ZoomInSelect.png')");
+         $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
+         $("#pan").css("background-image", "url('images/Pan.png')");
        });
 
        registry.byId("zoomout").on("click", function () {
          navToolbar.activate(Navigation.ZOOM_OUT);
+         $("#zoomout").css("background-image", "url('images/ZoomOutSelect.png')");
+         $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
+         $("#pan").css("background-image", "url('images/Pan.png')");
        });
 
        registry.byId("zoomfullext").on("click", function () {
@@ -238,9 +211,15 @@ function mapReady () {
 
        registry.byId("pan").on("click", function () {
          navToolbar.activate(Navigation.PAN);
+         $("#pan").css("background-image", "url('images/PanSelect.png')");
+         $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
+         $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
        });
 
        registry.byId("deactivate").on("click", function () {
+         $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
+         $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
+         $("#pan").css("background-image", "url('images/Pan.png')");
          navToolbar.deactivate();
        });
 
@@ -248,7 +227,13 @@ function mapReady () {
          registry.byId("zoomprev").disabled = navToolbar.isFirstExtent();
          registry.byId("zoomnext").disabled = navToolbar.isLastExtent();
        }
+       /*******************************************************************/
+       /******************* END - NAVIGATION TOOLBAR **********************/
+       /*******************************************************************/
 
+       /*******************************************************************/
+       /******* SEARCH Widget - For Hydrant ID, City Grid, and FZD ********/
+       /*******************************************************************/
       var itemSources = [
           {
             featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/3"),
@@ -286,7 +271,6 @@ function mapReady () {
           name: "FZD Query",
           //labelSymbol: textSymbol,
           placeholder: "FZD",
-          //prefix: "HY",
           //maxResults: 6,
           //maxSuggestions: 6,
           enableSuggestions: true,
@@ -306,14 +290,12 @@ function mapReady () {
       },"featureSearch");
       searchItem.startup();
 
-
       searchItem.on("search-results", function(e) {
         if (searchItem.activeSource.name == "Hydrant ID Query") {
           console.log(searchItem.activeSource);
-          var x = dynamicMapServiceLayer.layerInfos
-          console.log(x);
+          //var x = dynamicMapServiceLayer.layerInfos
+          //console.log(x);
           if (dynamicMapServiceLayer.layerInfos[3].visible == false) {
-            //dynamicMapServiceLayer.layerInfos[3].visible = true;
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
             console.log(inputs);
             var visible = [3];
@@ -328,10 +310,9 @@ function mapReady () {
         }
         else if (searchItem.activeSource.name == "City Grid Query") {
           console.log(searchItem.activeSource);
-          var x = dynamicMapServiceLayer.layerInfos
-          console.log(x);
+          //var x = dynamicMapServiceLayer.layerInfos
+          //console.log(x);
           if (dynamicMapServiceLayer.layerInfos[12].visible == false) {
-            //dynamicMapServiceLayer.layerInfos[3].visible = true;
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
             console.log(inputs);
             var visible = [12];
@@ -346,10 +327,9 @@ function mapReady () {
         }
         else if (searchItem.activeSource.name == "FZD Query") {
           console.log(searchItem.activeSource);
-          var x = dynamicMapServiceLayer.layerInfos
-          console.log(x);
+          //var x = dynamicMapServiceLayer.layerInfos
+          //console.log(x);
           if (dynamicMapServiceLayer.layerInfos[13].visible == false) {
-            //dynamicMapServiceLayer.layerInfos[3].visible = true;
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
             console.log(inputs);
             var visible = [13];
@@ -364,7 +344,13 @@ function mapReady () {
         }
       });
 
+      /*******************************************************************/
+      /**** END - SEARCH Widget - For Hydrant ID, City Grid, and FZD *****/
+      /*******************************************************************/
 
+      /*******************************************************************/
+      /**** SEARCH Widget - For Address Search after 10.3.1 Upgrade* *****/
+      /*******************************************************************/
       // var addressSources = [
       //     {
       //       locator: new Locator("http://helen2:6080/arcgis/rest/services/Geocoding/AllPoints_GS/GeocodeServer"),
@@ -392,11 +378,16 @@ function mapReady () {
       //   //enableButtonMode: true
       // },"search");
       // searchAddress.startup();
+      /*******************************************************************/
+      /** END - SEARCH Widget - For Address Search after 10.3.1 Upgrade **/
+      /*******************************************************************/
 
+      /*******************************************************************/
+      /* GEOCODER Widget - UPGRADE to SEARCH Widget after 10.3.1 Upgrade */
+      /*******************************************************************/
+      /* TODO - UPGRADE to SEARCH Widget after 10.3.1 Upgrade */
        var geocoders = [{
         url: "https://gisimages.greensboro-nc.gov/prod/rest/services/Geocoding/AllPoints/GeocodeServer",
-        //url: "http://apollo/ArcGIS/rest/services/Geocoding/AllPoints/GeocodeServer",
-        //url: "https://gisimages.greensboro-nc.gov/prod/rest/services/Geocoding/AddressPoints/GeocodeServer",
         name: "All Points",
         placeholder: "Address Search"
       }];
@@ -416,7 +407,7 @@ function mapReady () {
        $.ajax({
         url: "http://gisimages.greensboro-nc.gov/GsoGeoService/api/PointInPoly?x=" + response.result.feature.geometry.x + "&y=" + response.result.feature.geometry.y + "&l=5",
         success: function(result) {
-          //console.log(result);
+          console.log(result);
           $(".drillStationResults").hide();
           $("#agencyResult").html("AGENCY:   " + result[0].value);
           $("#districtResult").html("DISTRICT:  " + result[1].value);
@@ -439,58 +430,22 @@ function mapReady () {
 
      geocoder.on("clear", function(response) {
        $(".drillDownResults").html("");
+       $(".drillStationResults").html("");
      });
+     /*******************************************************************/
+     /******************** END - GEOCODER Widget ************************/
+     /*******************************************************************/
 
      //Toggles the closest station data in the Fire Drill Down info.
      $("#stationsToggle").click(function(){
          $(".drillStationResults").toggle();
      });
-http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/33/query?where=hydr_gpm%3E0+and+hydr_id%3D%27hy009-093%27&text=&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&outFields=*&returnGeometry=true&returnTrueCurves=false&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&returnZ=false&returnM=false&gdbVersion=&returnDistinctValues=false&resultOffset=&resultRecordCount=&f=html
+
   function getHydrantFlowData(callback) {
-    //var table;
    return $.ajax({
       type: "GET",
       url: "http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/33/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
-      success: callback// function(result) {
-      //   var hydrantFlowTests = JSON.parse(result);
-      //   //console.log(hydrantFlowTests);
-      //
-      //   var tableData;
-      //   // var table = $("<table/>")
-      //   // table.append("<tr><th>Date</th><th>Static</th><th>Residual</th><th>Pitot</th><th>GPM</th><th>@20</th><th>@10</th><th>@0</th></tr>");
-      //   // for (var i = 0; i < hydrantFlowTests.features.length; i++) {
-      //   //     tableData = $('<tr/>');
-      //   //     tableData.append("<td>" + hydrantFlowTests.features[i].attributes.date + "</td>");
-      //   //     tableData.append("<td>" + hydrantFlowTests.features[i].attributes.static + "</td>");
-      //   //     tableData.append("<td>" + hydrantFlowTests.features[i].attributes.residual + "</td>");
-      //   //     tableData.append("<td>" + hydrantFlowTests.features[i].attributes.pitot + "</td>");
-      //   //     tableData.append("<td>" + hydrantFlowTests.features[i].attributes.hydr_gpm + "</td>");
-      //   //     tableData.append("<td>" + hydrantFlowTests.features[i].attributes.gpm_20 + "</td>");
-      //   //     tableData.append("<td>" + hydrantFlowTests.features[i].attributes.gpm_10 + "</td>");
-      //   //     tableData.append("<td>" + hydrantFlowTests.features[i].attributes.gpm0 + "</td>");
-      //   //     table.append(tableData);
-      //   // }
-      //
-      //   table = "<table>";
-      //   table += "<tr><th>Date</th><th>Static</th><th>Residual</th><th>Pitot</th><th>GPM</th><th>@20</th><th>@10</th><th>@0</th></tr>";
-      //   for (var i = 0; i < hydrantFlowTests.features.length; i++) {
-      //       tableData = '<tr>';
-      //       tableData += "<td>" + hydrantFlowTests.features[i].attributes.date + "</td>";
-      //       tableData += "<td>" + hydrantFlowTests.features[i].attributes.static + "</td>";
-      //       tableData += "<td>" + hydrantFlowTests.features[i].attributes.residual + "</td>";
-      //       tableData += "<td>" + hydrantFlowTests.features[i].attributes.pitot + "</td>";
-      //       tableData += "<td>" + hydrantFlowTests.features[i].attributes.hydr_gpm + "</td>";
-      //       tableData += "<td>" + hydrantFlowTests.features[i].attributes.gpm_20 + "</td>";
-      //       tableData += "<td>" + hydrantFlowTests.features[i].attributes.gpm_10 + "</td>";
-      //       tableData += "<td>" + hydrantFlowTests.features[i].attributes.gpm_0 + "</td>";
-      //       table += tableData + "</tr>";
-      //   }
-      //   table += "</table>";
-      //   console.log(table);
-      //   return table;
-      // }
+      success: callback
     });
-    //console.log(table);
-
   }
 });
