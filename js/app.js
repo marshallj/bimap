@@ -4,8 +4,11 @@
     "dojo/_base/Color",
     "esri/map",
     "esri/geometry/Extent",
+    "esri/geometry/Point",
     "agsjs/dijit/TOC",
     "esri/layers/ArcGISDynamicMapServiceLayer",
+    "esri/layers/ArcGISImageServiceLayer",
+    "esri/layers/ImageServiceParameters",
     "esri/layers/ImageParameters",
     "esri/toolbars/navigation",
     "dojo/parser",
@@ -19,13 +22,15 @@
     "esri/symbols/SimpleFillSymbol",
     "esri/symbols/SimpleLineSymbol",
     "esri/symbols/SimpleMarkerSymbol",
+    "esri/symbols/PictureMarkerSymbol",
     "esri/tasks/IdentifyTask",
     "esri/tasks/IdentifyParameters",
     "esri/dijit/Popup",
+    "esri/graphic",
     "dojo/_base/array",
     "dojo/dom-construct",
-    "esri/dijit/LayerList",
     "dojo/query",
+    "dojo/_base/connect",
     "dijit/TitlePane",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
@@ -34,22 +39,23 @@
     "dijit/layout/AccordionContainer",
     "dijit/layout/AccordionPane",
     "dojo/domReady!"
-  ], function (connect, dom, Color, Map, Extent, TOC, ArcGISDynamicMapServiceLayer, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
-        SimpleLineSymbol, SimpleMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, arrayUtils, domConstruct, LayerList, query) {
+  ], function (connect, dom, Color, Map, Extent, Point, TOC, ArcGISDynamicMapServiceLayer, ArcGISImageServiceLayer, ImageServiceParameters, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
+        SimpleLineSymbol, SimpleMarkerSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, Graphic, arrayUtils, domConstruct, query, connect) {
 
-      var map, toc, navToolbar, geocoder, identifyTask, identifyParams, hydrantID;
-
+      var map, toc, tocOrtho, navToolbar, geocoder, identifyTask, identifyParams, hydrantID, graphic;
+      // var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10,
+      //   new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+      //   new Color([255,0,0]), 1),
+      //   new Color([0,255,0]));
+      var pictureSymbol = new PictureMarkerSymbol('images/PointHighlight.png', 32, 32);
+      var lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0,255,255, 0.8]), 3);
+      var fillSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 255, 255, 0.8]), 2), new Color([0, 255, 255, 0.1]));
       parser.parse();
 
       var popup = new Popup({
-        fillSymbol: new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID,
-          new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-            new Color([255, 0, 0]), 2), new Color([255, 255, 0, 0.25])),
-        lineSymbol: new SimpleLineSymbol(
-          SimpleLineSymbol.STYLE_SOLID, new Color([255,0,0]), 3),
-        markerSymbol: new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_SQUARE, 10,
-          new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-            new Color([255,0,0]), 1), new Color([0,255,0,0.25]))
+        markerSymbol: pictureSymbol,
+        lineSymbol: lineSymbol,
+        fillSymbol: fillSymbol,
       }, domConstruct.create("div"));
 
       map = new Map("mapDiv", {
@@ -57,16 +63,31 @@
         infoWindow: popup
       });
 
+      var imageParameters = new ImageParameters();
+      imageParameters.format = "jpeg"; //set the image type to PNG24, note default is PNG8.
+
+      var imageServiceParams = new ImageServiceParameters();
+
       var fireExplorerURL = "http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
+      var orthoURL = "http://helen2:6080/arcgis/rest/services/GISDivision/Guilford2014Ortho_IS/ImageServer"
+
       var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(fireExplorerURL, {
         "opacity" : 1.0,
         "imageParameters" : imageParameters
       });
-      map.addLayers([dynamicMapServiceLayer]);
 
+      var dynamicImageServiceLayer = new ArcGISImageServiceLayer(orthoURL, {
+        imageServiceParameters: imageServiceParams,
+        visible: false,
+        useMapImage: true
+      });
+      //map.setMapCursor("url('images/SelectCursor.png'), auto");
+      map.addLayers([dynamicImageServiceLayer, dynamicMapServiceLayer]);
       map.on("load", mapReady);
 
-function mapReady () {
+  function mapReady () {
+    $("#select").css("background-image", "url('images/CursorSelect.png')");
+
     map.on("click", executeIdentifyTask);
     //create identify tasks and setup parameters
     identifyTask = new IdentifyTask(fireExplorerURL);
@@ -81,6 +102,7 @@ function mapReady () {
   }
 
   function executeIdentifyTask (event) {
+    map.graphics.clear();
     identifyParams.geometry = event.mapPoint;
     identifyParams.mapExtent = map.extent;
 
@@ -98,6 +120,7 @@ function mapReady () {
 
           if (layerName === 'Hydrants') {
             hydrantID = attributes["Hydrant ID"];
+
             //console.log(hydrantID);
 
             getHydrantFlowData(function(result) {
@@ -110,7 +133,6 @@ function mapReady () {
               for (var i = 0; i < hydrantFlowContent.features.length; i++) {
                   var date = new Date(hydrantFlowContent.features[i].attributes.date);
                   tableData = '<tr>';
-                  // tableData += "<td>" + hydrantFlowContent.features[i].attributes.date + "</td>";
                   tableData += "<td>" + date.toLocaleDateString() + "</td>";
                   tableData += "<td>" + hydrantFlowContent.features[i].attributes.static + "</td>";
                   tableData += "<td>" + hydrantFlowContent.features[i].attributes.residual + "</td>";
@@ -135,20 +157,43 @@ function mapReady () {
             });
           }
           else if (layerName === 'Streets') {
-
-            var streetsTemplate = new InfoTemplate("Street", "Street: ${STREET}");
+            var streetsTemplate = new InfoTemplate("Street", "${*}");
             feature.setInfoTemplate(streetsTemplate);
 
+            map.infoWindow.resize(350, 200);
             map.infoWindow.setFeatures([deferred]);
             map.infoWindow.show(event.mapPoint);
+          }
+          else if (layerName === "City Address Points") {
+            var addressTemplate = new InfoTemplate("Address", "${*}");
+            feature.setInfoTemplate(addressTemplate);
+
+            map.infoWindow.resize(350, 200);
+            map.infoWindow.setFeatures([deferred]);
+            map.infoWindow.show(event.mapPoint);
+          }
+
+          if (feature.geometry.type == "point") {
+            var point = new Point(feature.geometry.x, feature.geometry.y, map.spatialReference);
+            graphic = new Graphic(point, pictureSymbol);
+            map.graphics.add(graphic);
           }
           return feature;
         });
       });
     }
 
-      var imageParameters = new ImageParameters();
-      imageParameters.format = "jpeg"; //set the image type to PNG24, note default is PNG8.
+    connect.connect(popup,"onHide",function(){
+        map.graphics.clear();
+    });
+
+    // connect.connect(popup,"onSelectionChange",function(){
+    //     for (var i = 0; i < popup.features.length; i++) {
+    //       if (popup.selectedIndex != popup.features[i]) {
+    //         popup.features[i].visible == false;
+    //       }
+    //     }
+    // });
 
       /*******************************************************************/
       /*************************** TOC Widget ****************************/
@@ -168,6 +213,16 @@ function mapReady () {
               }]
             }, 'tocDiv');
             toc.startup();
+
+            tocOrtho = new TOC({
+            map: map,
+            layerInfos: [{
+              layer: dynamicImageServiceLayer,
+              title: "2014 Orthos",
+              slider: true // whether to display a transparency slider.
+            }]
+          }, 'tocDivOrtho');
+          tocOrtho.startup();
           }
           catch(err) {
              console.error(err.message);
@@ -187,14 +242,16 @@ function mapReady () {
          navToolbar.activate(Navigation.ZOOM_IN);
          $("#zoomin").css("background-image", "url('images/ZoomInSelect.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
-         $("#pan").css("background-image", "url('images/Pan.png')");
+         $("#select").css("background-image", "url('images/Cursor.png')");
+         map.setMapCursor("url('images/ZoomInCursor.png'), auto");
        });
 
        registry.byId("zoomout").on("click", function () {
          navToolbar.activate(Navigation.ZOOM_OUT);
          $("#zoomout").css("background-image", "url('images/ZoomOutSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
-         $("#pan").css("background-image", "url('images/Pan.png')");
+         $("#select").css("background-image", "url('images/Cursor.png')");
+         map.setMapCursor("url('images/ZoomOutCursor.png'), auto");
        });
 
        registry.byId("zoomfullext").on("click", function () {
@@ -209,18 +266,13 @@ function mapReady () {
          navToolbar.zoomToNextExtent();
        });
 
-       registry.byId("pan").on("click", function () {
+       registry.byId("select").on("click", function () {
          navToolbar.activate(Navigation.PAN);
-         $("#pan").css("background-image", "url('images/PanSelect.png')");
+         $("#select").css("background-image", "url('images/CursorSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
-       });
-
-       registry.byId("deactivate").on("click", function () {
-         $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
-         $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
-         $("#pan").css("background-image", "url('images/Pan.png')");
-         navToolbar.deactivate();
+         //map.setMapCursor("url('images/SelectCursor.png'), auto");
+         map.setMapCursor("default");
        });
 
        function extentHistoryChangeHandler () {
@@ -241,6 +293,7 @@ function mapReady () {
             exactMatch: true,
             outFields: ["*"],
             name: "Hydrant ID Query",
+            highlightSymbol: pictureSymbol,
             //labelSymbol: textSymbol,
             placeholder: "Hydrant ID",
             //prefix: "HY",
@@ -256,6 +309,7 @@ function mapReady () {
           exactMatch: true,
           outFields: ["*"],
           name: "City Grid Query",
+          highlightSymbol: fillSymbol,
           //labelSymbol:  textSymbol,
           placeholder: "City Grid",
           //maxResults: 6,
@@ -269,6 +323,7 @@ function mapReady () {
           exactMatch: true,
           outFields: ["*"],
           name: "FZD Query",
+          highlightSymbol: fillSymbol,
           //labelSymbol: textSymbol,
           placeholder: "FZD",
           //maxResults: 6,
@@ -282,7 +337,7 @@ function mapReady () {
         map: map,
         sources: itemSources,
         //enableSuggestions: true,
-        enableHighlight: false,
+        enableHighlight: true,
         allPlaceholder: "Search All",
         zoomScale: 5000,
         showInfoWindowOnSelect: false
@@ -293,7 +348,6 @@ function mapReady () {
       searchItem.on("search-results", function(e) {
         if (searchItem.activeSource.name == "Hydrant ID Query") {
           console.log(searchItem.activeSource);
-          //var x = dynamicMapServiceLayer.layerInfos
           //console.log(x);
           if (dynamicMapServiceLayer.layerInfos[3].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
@@ -403,43 +457,65 @@ function mapReady () {
        geocoder.startup();
 
      geocoder.on("select", function(response) {
-       console.log(response);
+       //console.log(response.result.name);
        $.ajax({
         url: "http://gisimages.greensboro-nc.gov/GsoGeoService/api/PointInPoly?x=" + response.result.feature.geometry.x + "&y=" + response.result.feature.geometry.y + "&l=5",
         success: function(result) {
-          console.log(result);
+          //console.log(result);
           $(".drillStationResults").hide();
-          $("#agencyResult").html("AGENCY:   " + result[0].value);
-          $("#districtResult").html("DISTRICT:  " + result[1].value);
-          $("#reportResult").html("REPORT:   " + result[2].value);
-          $("#responseResult").html("RESPONSE: " + result[3].value);
+
+          $("#searchPrompt").html("<strong>" + response.result.name + ":</strong>");
+
+          $("#drillDownResult").css("display", "inline");
+
+          $("#agencyLabel").html("<strong>AGENCY:</strong>");
+          $("#districtLabel").html("<strong>DISTRICT:</strong>");
+          $("#reportLabel").html("<strong>REPORT:</strong>");
+          $("#responseLabel").html("<strong>RESPONSE:</strong>");
+
+          $("#agencyResult").html(result[0].value);
+          $("#districtResult").html(result[1].value);
+          $("#reportResult").html(result[2].value);
+          $("#responseResult").html(result[3].value);
+
           $("#stationsToggle").html("Toggle Stations")
-          $("#st1").html("ST1: " + result[4].value);
-          $("#st2").html("ST2: " + result[5].value);
-          $("#st3").html("ST3: " + result[6].value);
-          $("#st4").html("ST4: " + result[7].value);
-          $("#st5").html("ST5: " + result[8].value);
-          $("#st6").html("ST6: " + result[9].value);
-          $("#st7").html("ST7: " + result[10].value);
-          $("#st8").html("ST8: " + result[11].value);
-          $("#st9").html("ST9: " + result[12].value);
-          $("#st10").html("ST10: " + result[13].value);
+          $("#st1Label").html("<strong>ST1:</strong> ");
+          $("#st2Label").html("<strong>ST2:</strong> ");
+          $("#st3Label").html("<strong>ST3:</strong> ");
+          $("#st4Label").html("<strong>ST4:</strong> ");
+          $("#st5Label").html("<strong>ST5:</strong> ");
+          $("#st6Label").html("<strong>ST6:</strong> ");
+          $("#st7Label").html("<strong>ST7:</strong> ");
+          $("#st8Label").html("<strong>ST8:</strong> ");
+          $("#st9Label").html("<strong>ST9:</strong> ");
+          $("#st10Label").html("<strong>ST10:</strong> ");
+
+          $("#st1Result").html(result[4].value);
+          $("#st2Result").html(result[5].value);
+          $("#st3Result").html(result[6].value);
+          $("#st4Result").html(result[7].value);
+          $("#st5Result").html(result[8].value);
+          $("#st6Result").html(result[9].value);
+          $("#st7Result").html(result[10].value);
+          $("#st8Result").html(result[11].value);
+          $("#st9Result").html(result[12].value);
+          $("#st10Result").html(result[13].value);
         }
-     });
-   });
+      });
+    });
 
-     geocoder.on("clear", function(response) {
-       $(".drillDownResults").html("");
-       $(".drillStationResults").html("");
-     });
-     /*******************************************************************/
-     /******************** END - GEOCODER Widget ************************/
-     /*******************************************************************/
+    geocoder.on("clear", function(response) {
+      $("#drillDownResult").css("display", "none");
+      $("#searchPrompt").html("<strong>Search for an Address</strong>");
+    });
+    /*******************************************************************/
+    /******************** END - GEOCODER Widget ************************/
+    /*******************************************************************/
 
-     //Toggles the closest station data in the Fire Drill Down info.
-     $("#stationsToggle").click(function(){
-         $(".drillStationResults").toggle();
-     });
+    //Toggles the closest station data in the Fire Drill Down info.
+    $("#stationsToggle").click(function(){
+      $(".drillStationResults").toggle();
+    });
 
   function getHydrantFlowData(callback) {
    return $.ajax({

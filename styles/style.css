@@ -48,29 +48,27 @@ a:active {
     height: 100%;
 }
 
-.resultsLists {
-    list-style-type: none;
+/* FIRE DRILL DOWN TABLE STYLES */
+#drillDownResult {
+    display: none;
 }
 
-#stationsToggle {
-  color: blue;
-  text-decoration: underline;
+#searchPrompt {
+  font-size: 1.0em;
 }
 
-/*#stationsList {
-  visibility: hidden;
-}*/
+.resultsTables, .drillDownResults, .drillStationResults {
+  border: none;
+}
 
 .drillDownResults {
   margin: 3px;
 }
+/* END - FIRE DRILL DOWN TABLE STYLES */
 
-#LayerListContainer {
-  padding: 0;
-  margin: 0;
-  height:100%;
-  width: 10%;
-  float: left;
+#stationsToggle {
+  color: blue;
+  text-decoration: underline;
 }
 
 #header {
@@ -83,6 +81,7 @@ a:active {
 
 #toolbar {
   height: 45px;
+  margin-right: 20px;
 }
 
 #featureSearch {
@@ -136,14 +135,6 @@ a:active {
  background-repeat: no-repeat;
 }
 
-#zoomin:hover {
-
-}
-
-/*#zoomin:focus {
-  background-image: url("../images/ZoomInSelect.png");
-}*/
-
 #zoomout {
  background-image: url("../images/ZoomOut.png");
  background-repeat: no-repeat;
@@ -176,19 +167,19 @@ a:active {
   background-image: url("../images/NextExtentHighlight.png");
 }
 
-#pan {
- background-image: url("../images/Pan.png");
+#select {
+ background-image: url("../images/Cursor.png");
  background-repeat: no-repeat;
 }
 
-#deactivate {
+/*#deactivate {
  background-image: url("../images/Clear.png");
  background-repeat: no-repeat;
 }
 
 #deactivate:hover {
  background-image: url("../images/ClearHighlight.png");
-}
+}*/
 
 /* Collapse into a single border */
 table {
