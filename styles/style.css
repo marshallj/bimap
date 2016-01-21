@@ -140,6 +140,16 @@ a:active {
  background-repeat: no-repeat;
 }
 
+#zoomin {
+ background-image: url("../images/ZoomIn.png");
+ background-repeat: no-repeat;
+}
+
+#zoomout {
+ background-image: url("../images/ZoomOut.png");
+ background-repeat: no-repeat;
+}
+
 #zoomfullext {
  background-image: url("../images/ZoomFull.png");
  background-repeat: no-repeat;
