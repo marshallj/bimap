@@ -81,7 +81,6 @@
         visible: false,
         useMapImage: true
       });
-      //map.setMapCursor("url('images/SelectCursor.png'), auto");
       map.addLayers([dynamicImageServiceLayer, dynamicMapServiceLayer]);
       map.on("load", mapReady);
 
@@ -182,8 +181,7 @@
         });
       });
     }
-
-    connect.connect(popup,"onHide",function(){
+    connect.connect(popup, "onHide", function() {
         map.graphics.clear();
     });
 
@@ -238,7 +236,7 @@
       navToolbar = new Navigation(map);
        on(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
 
-       registry.byId("zoomin").on("click", function () {
+       registry.byId("zoomin").on("click", function() {
          navToolbar.activate(Navigation.ZOOM_IN);
          $("#zoomin").css("background-image", "url('images/ZoomInSelect.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
@@ -246,7 +244,7 @@
          map.setMapCursor("url('images/ZoomInCursor.png'), auto");
        });
 
-       registry.byId("zoomout").on("click", function () {
+       registry.byId("zoomout").on("click", function() {
          navToolbar.activate(Navigation.ZOOM_OUT);
          $("#zoomout").css("background-image", "url('images/ZoomOutSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
@@ -254,28 +252,27 @@
          map.setMapCursor("url('images/ZoomOutCursor.png'), auto");
        });
 
-       registry.byId("zoomfullext").on("click", function () {
+       registry.byId("zoomfullext").on("click", function() {
          navToolbar.zoomToFullExtent();
        });
 
-       registry.byId("zoomprev").on("click", function () {
+       registry.byId("zoomprev").on("click", function() {
          navToolbar.zoomToPrevExtent();
        });
 
-       registry.byId("zoomnext").on("click", function () {
+       registry.byId("zoomnext").on("click", function() {
          navToolbar.zoomToNextExtent();
        });
 
-       registry.byId("select").on("click", function () {
+       registry.byId("select").on("click", function() {
          navToolbar.activate(Navigation.PAN);
          $("#select").css("background-image", "url('images/CursorSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
-         //map.setMapCursor("url('images/SelectCursor.png'), auto");
          map.setMapCursor("default");
        });
 
-       function extentHistoryChangeHandler () {
+       function extentHistoryChangeHandler() {
          registry.byId("zoomprev").disabled = navToolbar.isFirstExtent();
          registry.byId("zoomnext").disabled = navToolbar.isLastExtent();
        }
@@ -318,7 +315,8 @@
           //minCharacters: 0
         },
         {
-          featureLayer: new FeatureLayer("https://gisimages.greensboro-nc.gov/prod/rest/services/GISDivision/GsoGeoService/MapServer/5"),
+          //featureLayer: new FeatureLayer("https://gisimages.greensboro-nc.gov/prod/rest/services/GISDivision/GsoGeoService/MapServer/5"),
+          featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/13"),
           searchFields: ["REPORT"],
           exactMatch: true,
           outFields: ["*"],
@@ -348,7 +346,6 @@
       searchItem.on("search-results", function(e) {
         if (searchItem.activeSource.name == "Hydrant ID Query") {
           console.log(searchItem.activeSource);
-          //console.log(x);
           if (dynamicMapServiceLayer.layerInfos[3].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
             console.log(inputs);
@@ -364,8 +361,6 @@
         }
         else if (searchItem.activeSource.name == "City Grid Query") {
           console.log(searchItem.activeSource);
-          //var x = dynamicMapServiceLayer.layerInfos
-          //console.log(x);
           if (dynamicMapServiceLayer.layerInfos[12].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
             console.log(inputs);
@@ -381,8 +376,6 @@
         }
         else if (searchItem.activeSource.name == "FZD Query") {
           console.log(searchItem.activeSource);
-          //var x = dynamicMapServiceLayer.layerInfos
-          //console.log(x);
           if (dynamicMapServiceLayer.layerInfos[13].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
             console.log(inputs);
