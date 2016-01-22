@@ -292,8 +292,8 @@
             name: "Hydrant ID Query",
             highlightSymbol: pictureSymbol,
             //labelSymbol: textSymbol,
-            placeholder: "Hydrant ID",
-            //prefix: "HY",
+            placeholder: "Hydrant ID - Ex:009-093",
+            prefix: "HY",
             //maxResults: 6,
             //maxSuggestions: 6,
             //enableSuggestions: true,
@@ -462,9 +462,9 @@
           $("#drillDownResult").css("display", "inline");
 
           $("#agencyLabel").html("<strong>AGENCY:</strong>");
-          $("#districtLabel").html("<strong>DISTRICT:</strong>");
-          $("#reportLabel").html("<strong>REPORT:</strong>");
-          $("#responseLabel").html("<strong>RESPONSE:</strong>");
+          $("#districtLabel").html("<strong>BATTALION:</strong>");
+          $("#reportLabel").html("<strong>FIRE DEMAND ZONE:</strong>");
+          $("#responseLabel").html("<strong>RESPONSE PLAN:</strong>");
 
           $("#agencyResult").html(result[0].value);
           $("#districtResult").html(result[1].value);
