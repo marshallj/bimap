@@ -9,6 +9,8 @@
     "esri/layers/ArcGISDynamicMapServiceLayer",
     "esri/layers/ArcGISImageServiceLayer",
     "esri/layers/ImageServiceParameters",
+    "esri/layers/ArcGISTiledMapServiceLayer",
+    "esri/layers/RasterLayer",
     "esri/layers/ImageParameters",
     "esri/toolbars/navigation",
     "dojo/parser",
@@ -39,7 +41,7 @@
     "dijit/layout/AccordionContainer",
     "dijit/layout/AccordionPane",
     "dojo/domReady!"
-  ], function (connect, dom, Color, Map, Extent, Point, TOC, ArcGISDynamicMapServiceLayer, ArcGISImageServiceLayer, ImageServiceParameters, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
+  ], function (connect, dom, Color, Map, Extent, Point, TOC, ArcGISDynamicMapServiceLayer, ArcGISImageServiceLayer, ImageServiceParameters, ArcGISTiledMapServiceLayer, RasterLayer, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
         SimpleLineSymbol, SimpleMarkerSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, Graphic, arrayUtils, domConstruct, query, connect) {
 
       var map, toc, tocOrtho, navToolbar, geocoder, identifyTask, identifyParams, hydrantID, graphic;
@@ -69,7 +71,8 @@
       var imageServiceParams = new ImageServiceParameters();
 
       var fireExplorerURL = "http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
-      var orthoURL = "http://helen2:6080/arcgis/rest/services/GISDivision/Guilford2014Ortho_IS/ImageServer"
+      //var orthoURL = "http://helen2:6080/arcgis/rest/services/GISDivision/Guilford2014Ortho_IS/ImageServer"
+      var orthoURL = "http://gis.co.guilford.nc.us/arcgis/rest/services/Basemaps/Guilford_2014_Orthos4Web_NAD83/MapServer"
 
       var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(fireExplorerURL, {
         "opacity" : 1.0,
@@ -81,7 +84,13 @@
         visible: false,
         useMapImage: true
       });
-      map.addLayers([dynamicImageServiceLayer, dynamicMapServiceLayer]);
+
+      var tiledMapServiceLayer = new ArcGISTiledMapServiceLayer(orthoURL, {
+        visible: false,
+        displayLevels: [3,4,5,6,7,8,9]
+      });
+
+      map.addLayers([tiledMapServiceLayer, dynamicMapServiceLayer]);
       map.on("load", mapReady);
 
   function mapReady () {
@@ -206,8 +215,6 @@
               layerInfos: [{
                 layer: dynamicMapServiceLayer,
                 title: "Fire Explorer Layers"
-                //collapsed: false, // whether this root layer should be collapsed initially, default false.
-                //slider: true // whether to display a transparency slider.
               }]
             }, 'tocDiv');
             toc.startup();
@@ -215,8 +222,9 @@
             tocOrtho = new TOC({
             map: map,
             layerInfos: [{
-              layer: dynamicImageServiceLayer,
-              title: "2014 Orthos",
+              layer: tiledMapServiceLayer,
+              noLegend: true,
+              title: "2014 Guilford Ortho",
               slider: true // whether to display a transparency slider.
             }]
           }, 'tocDivOrtho');
@@ -315,7 +323,6 @@
           //minCharacters: 0
         },
         {
-          //featureLayer: new FeatureLayer("https://gisimages.greensboro-nc.gov/prod/rest/services/GISDivision/GsoGeoService/MapServer/5"),
           featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/13"),
           searchFields: ["REPORT"],
           exactMatch: true,
