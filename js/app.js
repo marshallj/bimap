@@ -52,6 +52,8 @@
       var pictureSymbol = new PictureMarkerSymbol('images/PointHighlight.png', 32, 32);
       var lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0,255,255, 0.8]), 3);
       var fillSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 255, 255, 0.8]), 2), new Color([0, 255, 255, 0.1]));
+
+      var startExtent = new Extent(1659734.28936683, 791324.824158028, 1867556.626367224, 915192.442237733, new esri.SpatialReference({wkid:2264}) );
       parser.parse();
 
       var popup = new Popup({
@@ -62,6 +64,7 @@
 
       map = new Map("mapDiv", {
         sliderOrientation : "vertical",
+         extent: startExtent,
         infoWindow: popup
       });
 
@@ -79,11 +82,11 @@
         "imageParameters" : imageParameters
       });
 
-      var dynamicImageServiceLayer = new ArcGISImageServiceLayer(orthoURL, {
-        imageServiceParameters: imageServiceParams,
-        visible: false,
-        useMapImage: true
-      });
+      // var dynamicImageServiceLayer = new ArcGISImageServiceLayer(orthoURL, {
+      //   imageServiceParameters: imageServiceParams,
+      //   visible: false,
+      //   useMapImage: true
+      // });
 
       var tiledMapServiceLayer = new ArcGISTiledMapServiceLayer(orthoURL, {
         visible: false,
@@ -261,7 +264,8 @@
        });
 
        registry.byId("zoomfullext").on("click", function() {
-         navToolbar.zoomToFullExtent();
+         //navToolbar.zoomToFullExtent();
+         map.setExtent(startExtent);
        });
 
        registry.byId("zoomprev").on("click", function() {
