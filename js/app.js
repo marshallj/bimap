@@ -64,7 +64,7 @@
 
       map = new Map("mapDiv", {
         sliderOrientation : "vertical",
-         extent: startExtent,
+        extent: startExtent,
         infoWindow: popup
       });
 
@@ -102,12 +102,13 @@
     map.on("click", executeIdentifyTask);
     //create identify tasks and setup parameters
     identifyTask = new IdentifyTask(fireExplorerURL);
-
     identifyParams = new IdentifyParameters();
     identifyParams.tolerance = 5;
     identifyParams.returnGeometry = true;
-    identifyParams.layerIds = [1, 3, 10, 12];
     identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_VISIBLE;
+    identifyParams.layerIds = [0, 1, 2, 9, 10, 13, 14, 15, 17, 18, 20, 24, 25, 29, 33, 34, 35, 36, 37, 38];
+    //identifyParams.layerIds = map.visibleLayers;
+
     identifyParams.width = map.width;
     identifyParams.height = map.height;
   }
@@ -120,24 +121,31 @@
     var deferred = identifyTask
       .execute(identifyParams)
       .addCallback(function (response) {
-        //console.log(response);
+        console.log(response);
         // response is an array of identify result objects
-        // Let's return an array of features.
-        return arrayUtils.map(response, function (result) {
-          console.log("Result: " + JSON.stringify(result));
+        // visibleResponse is an array of visible identify result objects
+        var visibleResponse = [];
+        for (var i = 0; i < response.length; i++) {
+          if (dynamicMapServiceLayer.layerInfos[response[i].layerId].visible == true) {
+            visibleResponse.push(response[i]);
+          }
+        }
+        // Let's return an array of features from identifiable visible layers.
+        return arrayUtils.map(visibleResponse, function (result) {
+          //console.log(result);
           var feature = result.feature;
           var layerName = result.layerName;
           var attributes = feature.attributes;
 
           if (layerName === 'Hydrants') {
-            hydrantID = attributes["Hydrant ID"];
+            hydrantID = attributes["Hydrant_ID"];
 
             //console.log(hydrantID);
 
             getHydrantFlowData(function(result) {
-              console.log("AJAX Result: " + result);
+              //console.log(result);
               var hydrantFlowContent = JSON.parse(result);
-              console.log("HydrantFlowJSON: " + JSON.stringify(hydrantFlowContent));
+              //console.log("HydrantFlowJSON: " + JSON.stringify(hydrantFlowContent));
               var table, tableData;
               table = "<table id='hydFlowTable'>";
               table += "<tr><th>Date</th><th>Static</th><th>Residual</th><th>Pitot</th><th>GPM</th><th>@20</th><th>@10</th><th>@0</th></tr>";
@@ -155,11 +163,12 @@
                   table += tableData + "</tr>";
               }
               table += "</table>";
-              var infoTemplateContent = "<strong>Hydrant ID:</strong> ${Hydrant ID} <br/> <strong>Main Size:</strong> ${Main Size} <br/> <strong>Hydrant Flow Data:</strong> <br/>" + table;
-              console.log("Table: " + table);
+              //var infoTemplateContent = "<strong>Hydrant ID:</strong> ${Hydrant_ID} <br/> <strong>Main Size:</strong> ${Main Size} <br/> <strong>Hydrant Flow Data:</strong> <br/>" + table;
+              var infoTemplateContent = "<strong>Hydrant ID:</strong> ${Hydrant_ID} <br/> <strong>Hydrant Flow Data:</strong> <br/>" + table;
+              //console.log("Table: " + table);
               var hydrantTemplate = new InfoTemplate("Hydrants", infoTemplateContent);
 
-              console.log("InfoTemplate: " + JSON.stringify(hydrantTemplate));
+              //console.log("InfoTemplate: " + JSON.stringify(hydrantTemplate));
               feature.setInfoTemplate(hydrantTemplate);
 
               map.infoWindow.resize(450, 200);
@@ -167,23 +176,15 @@
               map.infoWindow.show(event.mapPoint);
             });
           }
-          else if (layerName === 'Streets') {
-            var streetsTemplate = new InfoTemplate("Street", "${*}");
-            feature.setInfoTemplate(streetsTemplate);
+          else {
+            var basicTemplate = new InfoTemplate(layerName, "${*}");
+            feature.setInfoTemplate(basicTemplate);
 
             map.infoWindow.resize(350, 200);
             map.infoWindow.setFeatures([deferred]);
             map.infoWindow.show(event.mapPoint);
           }
-          else if (layerName === "City Address Points") {
-            var addressTemplate = new InfoTemplate("Address", "${*}");
-            feature.setInfoTemplate(addressTemplate);
-
-            map.infoWindow.resize(350, 200);
-            map.infoWindow.setFeatures([deferred]);
-            map.infoWindow.show(event.mapPoint);
-          }
-
+          //Hardcode select graphic for points due to API bug.
           if (feature.geometry.type == "point") {
             var point = new Point(feature.geometry.x, feature.geometry.y, map.spatialReference);
             graphic = new Graphic(point, pictureSymbol);
@@ -297,14 +298,14 @@
        /*******************************************************************/
       var itemSources = [
           {
-            featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/3"),
-            searchFields: ["AssetID"],
+            featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/10"),
+            searchFields: ["Hydrant_ID"],
             exactMatch: true,
             outFields: ["*"],
             name: "Hydrant ID Query",
             highlightSymbol: pictureSymbol,
             //labelSymbol: textSymbol,
-            placeholder: "Hydrant ID - Ex:009-093",
+            placeholder: "Hydrant ID - Ex: 009-093",
             prefix: "HY",
             //maxResults: 6,
             //maxSuggestions: 6,
@@ -312,7 +313,7 @@
             //minCharacters: 0
           },
           {
-          featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/12"),
+          featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/19"),
           searchFields: ["Tag"],
           //suggestionTemplate: "Grid: ${Tag}",
           exactMatch: true,
@@ -327,14 +328,14 @@
           //minCharacters: 0
         },
         {
-          featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/13"),
+          featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/20"),
           searchFields: ["REPORT"],
           exactMatch: true,
           outFields: ["*"],
-          name: "FZD Query",
+          name: "FDZ Query",
           highlightSymbol: fillSymbol,
           //labelSymbol: textSymbol,
-          placeholder: "FZD",
+          placeholder: "FDZ",
           //maxResults: 6,
           //maxSuggestions: 6,
           enableSuggestions: true,
@@ -356,47 +357,47 @@
 
       searchItem.on("search-results", function(e) {
         if (searchItem.activeSource.name == "Hydrant ID Query") {
-          console.log(searchItem.activeSource);
-          if (dynamicMapServiceLayer.layerInfos[3].visible == false) {
+          //console.log(searchItem.activeSource);
+          if (dynamicMapServiceLayer.layerInfos[10].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
-            console.log(inputs);
-            var visible = [3];
+            //console.log(inputs);
+            var visible = [10];
             for (var i = 1; i < inputs.length; i++) {
               if (inputs[i].checked) {
                 visible.push(i - 1);
               }
             }
-            console.log(visible);
+            //console.log(visible);
             dynamicMapServiceLayer.setVisibleLayers(visible);
           }
         }
         else if (searchItem.activeSource.name == "City Grid Query") {
-          console.log(searchItem.activeSource);
+          //console.log(searchItem.activeSource);
           if (dynamicMapServiceLayer.layerInfos[12].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
-            console.log(inputs);
+            //console.log(inputs);
             var visible = [12];
             for (var i = 1; i < inputs.length; i++) {
               if (inputs[i].checked) {
                 visible.push(i - 1);
               }
             }
-            console.log(visible);
+            //console.log(visible);
             dynamicMapServiceLayer.setVisibleLayers(visible);
           }
         }
         else if (searchItem.activeSource.name == "FZD Query") {
-          console.log(searchItem.activeSource);
+          //console.log(searchItem.activeSource);
           if (dynamicMapServiceLayer.layerInfos[13].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
-            console.log(inputs);
+            //console.log(inputs);
             var visible = [13];
             for (var i = 1; i < inputs.length; i++) {
               if (inputs[i].checked) {
                 visible.push(i - 1);
               }
             }
-            console.log(visible);
+            //console.log(visible);
             dynamicMapServiceLayer.setVisibleLayers(visible);
           }
         }
@@ -524,7 +525,7 @@
   function getHydrantFlowData(callback) {
    return $.ajax({
       type: "GET",
-      url: "http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/33/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
+      url: "http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/40/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
       success: callback
     });
   }
