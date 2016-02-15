@@ -73,7 +73,7 @@
 
       var imageServiceParams = new ImageServiceParameters();
 
-      var fireExplorerURL = "http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
+      var fireExplorerURL = "https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
       //var orthoURL = "http://helen2:6080/arcgis/rest/services/GISDivision/Guilford2014Ortho_IS/ImageServer"
       var orthoURL = "http://gis.co.guilford.nc.us/arcgis/rest/services/Basemaps/Guilford_2014_Orthos4Web_NAD83/MapServer"
 
@@ -298,7 +298,7 @@
        /*******************************************************************/
       var itemSources = [
           {
-            featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/10"),
+            featureLayer: new FeatureLayer("https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/10"),
             searchFields: ["Hydrant_ID"],
             exactMatch: true,
             outFields: ["*"],
@@ -313,7 +313,7 @@
             //minCharacters: 0
           },
           {
-          featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/19"),
+          featureLayer: new FeatureLayer("https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/19"),
           searchFields: ["Tag"],
           //suggestionTemplate: "Grid: ${Tag}",
           exactMatch: true,
@@ -328,7 +328,7 @@
           //minCharacters: 0
         },
         {
-          featureLayer: new FeatureLayer("http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/20"),
+          featureLayer: new FeatureLayer("https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/20"),
           searchFields: ["REPORT"],
           exactMatch: true,
           outFields: ["*"],
@@ -373,10 +373,10 @@
         }
         else if (searchItem.activeSource.name == "City Grid Query") {
           //console.log(searchItem.activeSource);
-          if (dynamicMapServiceLayer.layerInfos[12].visible == false) {
+          if (dynamicMapServiceLayer.layerInfos[19].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
             //console.log(inputs);
-            var visible = [12];
+            var visible = [19];
             for (var i = 1; i < inputs.length; i++) {
               if (inputs[i].checked) {
                 visible.push(i - 1);
@@ -388,10 +388,10 @@
         }
         else if (searchItem.activeSource.name == "FZD Query") {
           //console.log(searchItem.activeSource);
-          if (dynamicMapServiceLayer.layerInfos[13].visible == false) {
+          if (dynamicMapServiceLayer.layerInfos[20].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
             //console.log(inputs);
-            var visible = [13];
+            var visible = [20];
             for (var i = 1; i < inputs.length; i++) {
               if (inputs[i].checked) {
                 visible.push(i - 1);
@@ -446,7 +446,7 @@
       /*******************************************************************/
       /* TODO - UPGRADE to SEARCH Widget after 10.3.1 Upgrade */
        var geocoders = [{
-        url: "https://gisimages.greensboro-nc.gov/prod/rest/services/Geocoding/AllPoints/GeocodeServer",
+        url: "https://gis.greensboro-nc.gov/arcgis/rest/services/Geocoding/AllPoints/GeocodeServer",
         name: "All Points",
         placeholder: "Address Search"
       }];
@@ -464,7 +464,9 @@
      geocoder.on("select", function(response) {
        //console.log(response.result.name);
        $.ajax({
-        url: "http://gisimages.greensboro-nc.gov/GsoGeoService/api/PointInPoly?x=" + response.result.feature.geometry.x + "&y=" + response.result.feature.geometry.y + "&l=5",
+        url: "http://gisapps.greensboronc.org/GsoGeoService/api/PointInPoly?x=" + response.result.feature.geometry.x + "&y=" + response.result.feature.geometry.y + "&l=5",
+        jsonp: "callback",
+        dataType: "jsonp",
         success: function(result) {
           //console.log(result);
           $(".drillStationResults").hide();
@@ -525,7 +527,7 @@
   function getHydrantFlowData(callback) {
    return $.ajax({
       type: "GET",
-      url: "http://helen2:6080/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/40/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
+      url: "https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/40/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
       success: callback
     });
   }
