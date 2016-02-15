@@ -73,7 +73,7 @@
 
       var imageServiceParams = new ImageServiceParameters();
 
-      var fireExplorerURL = "https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
+      var fireExplorerURL = "https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
       //var orthoURL = "http://helen2:6080/arcgis/rest/services/GISDivision/Guilford2014Ortho_IS/ImageServer"
       var orthoURL = "http://gis.co.guilford.nc.us/arcgis/rest/services/Basemaps/Guilford_2014_Orthos4Web_NAD83/MapServer"
 
@@ -121,7 +121,7 @@
     var deferred = identifyTask
       .execute(identifyParams)
       .addCallback(function (response) {
-        console.log(response);
+        //console.log(response);
         // response is an array of identify result objects
         // visibleResponse is an array of visible identify result objects
         var visibleResponse = [];
@@ -298,7 +298,7 @@
        /*******************************************************************/
       var itemSources = [
           {
-            featureLayer: new FeatureLayer("https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/10"),
+            featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/10"),
             searchFields: ["Hydrant_ID"],
             exactMatch: true,
             outFields: ["*"],
@@ -313,7 +313,7 @@
             //minCharacters: 0
           },
           {
-          featureLayer: new FeatureLayer("https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/19"),
+          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/19"),
           searchFields: ["Tag"],
           //suggestionTemplate: "Grid: ${Tag}",
           exactMatch: true,
@@ -328,7 +328,7 @@
           //minCharacters: 0
         },
         {
-          featureLayer: new FeatureLayer("https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/20"),
+          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/20"),
           searchFields: ["REPORT"],
           exactMatch: true,
           outFields: ["*"],
@@ -527,7 +527,7 @@
   function getHydrantFlowData(callback) {
    return $.ajax({
       type: "GET",
-      url: "https://helen2.greensboronc.org:6443/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/40/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
+      url: "https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/40/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
       success: callback
     });
   }
