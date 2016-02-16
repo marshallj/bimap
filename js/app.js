@@ -131,7 +131,7 @@
         }
         // Let's return an array of features from identifiable visible layers.
         return arrayUtils.map(visibleResponse, function (result) {
-          console.log(result);
+          //console.log(result);
           var feature = result.feature;
           var layerName = result.layerName;
           var attributes = feature.attributes;
@@ -197,15 +197,15 @@
         map.graphics.clear();
     });
 
-    connect.connect(popup,"onSelectionChange",function() {
+    //connect.connect(popup,"onSelectionChange",function() {
       // if (popup._highlighted.geometry.type != "point" && popup._highlighted._graphicsLayer.graphics.length > 1) {
       //   map.graphics.remove(pointGraphic);
       // }
       // else if (popup._highlighted.geometry.type == "point") {
       //   map.graphics.add(pointGraphic);
       // }
-      console.log(popup);
-    });
+      //console.log(popup);
+    //});
 
       /*******************************************************************/
       /*************************** TOC Widget ****************************/
