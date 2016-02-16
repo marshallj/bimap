@@ -140,7 +140,7 @@
             hydrantID = attributes["Hydrant_ID"];
 
             //console.log(hydrantID);
-
+            //test
             getHydrantFlowData(function(result) {
               //console.log(result);
               var hydrantFlowContent = JSON.parse(result);
