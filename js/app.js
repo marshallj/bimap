@@ -44,7 +44,7 @@
   ], function (connect, dom, Color, Map, Extent, Point, TOC, ArcGISDynamicMapServiceLayer, ArcGISImageServiceLayer, ImageServiceParameters, ArcGISTiledMapServiceLayer, RasterLayer, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
         SimpleLineSymbol, SimpleMarkerSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, Graphic, arrayUtils, domConstruct, query, connect) {
 
-      var map, toc, tocOrtho, navToolbar, geocoder, identifyTask, identifyParams, hydrantID, graphic;
+      var map, toc, tocOrtho, navToolbar, geocoder, identifyTask, identifyParams, hydrantID, pointGraphic;
       // var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10,
       //   new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
       //   new Color([255,0,0]), 1),
@@ -107,7 +107,6 @@
     identifyParams.returnGeometry = true;
     identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_VISIBLE;
     identifyParams.layerIds = [0, 1, 2, 9, 10, 13, 14, 15, 17, 18, 20, 24, 25, 29, 33, 34, 35, 36, 37, 38];
-    //identifyParams.layerIds = map.visibleLayers;
 
     identifyParams.width = map.width;
     identifyParams.height = map.height;
@@ -132,7 +131,7 @@
         }
         // Let's return an array of features from identifiable visible layers.
         return arrayUtils.map(visibleResponse, function (result) {
-          //console.log(result);
+          console.log(result);
           var feature = result.feature;
           var layerName = result.layerName;
           var attributes = feature.attributes;
@@ -187,8 +186,8 @@
           //Hardcode select graphic for points due to API bug.
           if (feature.geometry.type == "point") {
             var point = new Point(feature.geometry.x, feature.geometry.y, map.spatialReference);
-            graphic = new Graphic(point, pictureSymbol);
-            map.graphics.add(graphic);
+            pointGraphic = new Graphic(point, pictureSymbol);
+            map.graphics.add(pointGraphic);
           }
           return feature;
         });
@@ -198,13 +197,15 @@
         map.graphics.clear();
     });
 
-    // connect.connect(popup,"onSelectionChange",function(){
-    //     for (var i = 0; i < popup.features.length; i++) {
-    //       if (popup.selectedIndex != popup.features[i]) {
-    //         popup.features[i].visible == false;
-    //       }
-    //     }
-    // });
+    connect.connect(popup,"onSelectionChange",function() {
+      // if (popup._highlighted.geometry.type != "point" && popup._highlighted._graphicsLayer.graphics.length > 1) {
+      //   map.graphics.remove(pointGraphic);
+      // }
+      // else if (popup._highlighted.geometry.type == "point") {
+      //   map.graphics.add(pointGraphic);
+      // }
+      console.log(popup);
+    });
 
       /*******************************************************************/
       /*************************** TOC Widget ****************************/
@@ -446,7 +447,7 @@
       /*******************************************************************/
       /* TODO - UPGRADE to SEARCH Widget after 10.3.1 Upgrade */
        var geocoders = [{
-        url: "https://gis.greensboro-nc.gov/arcgis/rest/services/Geocoding/AllPoints/GeocodeServer",
+        url: "https://gis.greensboro-nc.gov/arcgis/rest/services/Geocoding/AllPoints_GCS/GeocodeServer",
         name: "All Points",
         placeholder: "Address Search"
       }];
