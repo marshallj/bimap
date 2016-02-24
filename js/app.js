@@ -44,6 +44,9 @@
   ], function (connect, dom, Color, Map, Extent, Point, TOC, ArcGISDynamicMapServiceLayer, ArcGISImageServiceLayer, ImageServiceParameters, ArcGISTiledMapServiceLayer, RasterLayer, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
         SimpleLineSymbol, SimpleMarkerSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, Graphic, arrayUtils, domConstruct, query, connect) {
 
+      /******* Update with "arcgis" for production and update with "test" for test ********/
+      var prodOrTest = "test"
+      /************************************************************************************/
       var map, toc, tocOrtho, navToolbar, geocoder, identifyTask, identifyParams, hydrantID, pointGraphic;
       // var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10,
       //   new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
@@ -73,7 +76,8 @@
 
       var imageServiceParams = new ImageServiceParameters();
 
-      var fireExplorerURL = "https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
+      var fireExplorerURL = "https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer";
+      //var fireExplorerURL = "https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
       //var orthoURL = "http://helen2:6080/arcgis/rest/services/GISDivision/Guilford2014Ortho_IS/ImageServer"
       var orthoURL = "http://gis.co.guilford.nc.us/arcgis/rest/services/Basemaps/Guilford_2014_Orthos4Web_NAD83/MapServer"
 
@@ -299,7 +303,7 @@
        /*******************************************************************/
       var itemSources = [
           {
-            featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/10"),
+            featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer/10"),
             searchFields: ["Hydrant_ID"],
             exactMatch: true,
             outFields: ["*"],
@@ -314,7 +318,7 @@
             //minCharacters: 0
           },
           {
-          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/19"),
+          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer/19"),
           searchFields: ["Tag"],
           //suggestionTemplate: "Grid: ${Tag}",
           exactMatch: true,
@@ -329,7 +333,7 @@
           //minCharacters: 0
         },
         {
-          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/20"),
+          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer/20"),
           searchFields: ["REPORT"],
           exactMatch: true,
           outFields: ["*"],
@@ -447,7 +451,7 @@
       /*******************************************************************/
       /* TODO - UPGRADE to SEARCH Widget after 10.3.1 Upgrade */
        var geocoders = [{
-        url: "https://gis.greensboro-nc.gov/arcgis/rest/services/Geocoding/AllPoints_GCS/GeocodeServer",
+        url: "https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Geocoding/AllPoints_GCS/GeocodeServer",
         name: "All Points",
         placeholder: "Address Search"
       }];
@@ -528,7 +532,7 @@
   function getHydrantFlowData(callback) {
    return $.ajax({
       type: "GET",
-      url: "https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer/40/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
+      url: "https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer/40/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
       success: callback
     });
   }
