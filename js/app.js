@@ -45,7 +45,7 @@
         SimpleLineSymbol, SimpleMarkerSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, Graphic, arrayUtils, domConstruct, query, connect) {
 
       /******* Update with "arcgis" for production and update with "test" for test ********/
-      var prodOrTest = "test"
+      var prodOrTest = "test";
       /************************************************************************************/
       var map, toc, tocOrtho, navToolbar, geocoder, identifyTask, identifyParams, hydrantID, pointGraphic;
       // var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10,
