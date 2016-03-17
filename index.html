@@ -18,11 +18,11 @@
   };
 </script>
 
-  <link rel="stylesheet" href="https://js.arcgis.com/3.15/dijit/themes/claro/claro.css"/>
-  <link rel="stylesheet" href="https://js.arcgis.com/3.15/esri/css/esri.css"/>
+  <link rel="stylesheet" href="https://js.arcgis.com/3.16/dijit/themes/claro/claro.css"/>
+  <link rel="stylesheet" href="https://js.arcgis.com/3.16/esri/css/esri.css"/>
   <link rel="stylesheet" href="src/agsjs/css/agsjs.css"/>
   <link rel="stylesheet" href="styles/style.css"/>
-  <script src="https://js.arcgis.com/3.15/"></script>
+  <script src="https://js.arcgis.com/3.16/"></script>
   <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script src="js/app.js"></script>
 </head>
@@ -33,7 +33,7 @@
     <div id="header" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top', splitter:false">
       <div id="fireLinks">
         <p>
-          <a href="mailto:jason.marshall@greensboro-nc.gov?cc=todd.tuttle@greensboro-nc.gov;katie.buckner@greensboro-nc.gov&subject=Fire%20Explorer%20User%20Testing%20Report%20Bugs%20and%20Feedback" >Beta Feedback</a> | <a href="http://centralstation/" target="_blank">Central Station</a> | <a href="http://gisapps.greensboronc.org/HydrantMapper/" target="_blank">Hydrant Mapper</a> | <a href="http://gisimages.greensboro-nc.gov/GSOMapGallery/" target="_blank">GIS Map Gallery</a>
+          <a href="mailto:jason.marshall@greensboro-nc.gov?cc=todd.tuttle@greensboro-nc.gov,katie.buckner@greensboro-nc.gov&subject=Fire%20Explorer%20User%20Testing%20Report%20Bugs%20and%20Feedback" >Beta Feedback</a> | <a href="http://centralstation/" target="_blank">Central Station</a> | <a href="http://xanthus/HydrantMapper/" target="_blank">Hydrant Mapper</a> | <a href="http://gisimages.greensboro-nc.gov/GSOMapGallery/" target="_blank">GIS Map Gallery</a>
         </p>
       </div>
       <img id="gfdPatch" src="images/GFDPatch.png" alt="Greensboro Fire Department Patch" height="104" width="75">
@@ -46,6 +46,7 @@
           <button id="zoomfullext" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
           <button id="zoomprev" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
           <button id="zoomnext" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+          <button id="measurement" class="navButton" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
         </div>
       </div>
     </div>
@@ -123,6 +124,9 @@
 
     <div id="mapDiv" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
       <div id="search"></div>
+      <div style="position:absolute; right:20px; top:10px; z-Index:999;">
+        <div id="measurementDiv"></div>
+      </div>
     </div>
   </div>
 </body>

@@ -1,5 +1,4 @@
   require([
-    "dojo/_base/connect",
     "dojo/dom",
     "dojo/_base/Color",
     "esri/map",
@@ -29,6 +28,8 @@
     "esri/tasks/IdentifyParameters",
     "esri/dijit/Popup",
     "esri/graphic",
+    "esri/dijit/Measurement",
+    "esri/config",
     "dojo/_base/array",
     "dojo/dom-construct",
     "dojo/query",
@@ -41,17 +42,23 @@
     "dijit/layout/AccordionContainer",
     "dijit/layout/AccordionPane",
     "dojo/domReady!"
-  ], function (connect, dom, Color, Map, Extent, Point, TOC, ArcGISDynamicMapServiceLayer, ArcGISImageServiceLayer, ImageServiceParameters, ArcGISTiledMapServiceLayer, RasterLayer, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
-        SimpleLineSymbol, SimpleMarkerSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, Graphic, arrayUtils, domConstruct, query, connect) {
+  ], function (dom, Color, Map, Extent, Point, TOC, ArcGISDynamicMapServiceLayer, ArcGISImageServiceLayer, ImageServiceParameters, ArcGISTiledMapServiceLayer, RasterLayer, ImageParameters, Navigation, parser, registry, on, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
+        SimpleLineSymbol, SimpleMarkerSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, Graphic, Measurement, esriConfig, arrayUtils, domConstruct, query, connect) {
 
       /******* Update with "arcgis" for production and update with "test" for test ********/
-      var prodOrTest = "test";
+      var webAdaptor = "test";
       /************************************************************************************/
       var map, toc, tocOrtho, navToolbar, geocoder, identifyTask, identifyParams, hydrantID, pointGraphic;
+
+      // Flag for disabling popups when the measuremnt tool is active.
+      var isMeasureEnabled = false;
+
+      esriConfig.defaults.geometryService = new esri.tasks.GeometryService("https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Utilities/Geometry/GeometryServer");
+
       // var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10,
-      //   new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-      //   new Color([255,0,0]), 1),
-      //   new Color([0,255,0]));
+      // new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
+      // new Color([255,0,0]), 1),
+      // new Color([0,255,0]));
       var pictureSymbol = new PictureMarkerSymbol('images/PointHighlight.png', 32, 32);
       var lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0,255,255, 0.8]), 3);
       var fillSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 255, 255, 0.8]), 2), new Color([0, 255, 255, 0.1]));
@@ -71,12 +78,18 @@
         infoWindow: popup
       });
 
+      var measurement = new Measurement({
+        map: map
+      }, dom.byId("measurementDiv"));
+      measurement.startup();
+      measurement.hideTool("location");
+
       var imageParameters = new ImageParameters();
       imageParameters.format = "jpeg"; //set the image type to PNG24, note default is PNG8.
 
       var imageServiceParams = new ImageServiceParameters();
 
-      var fireExplorerURL = "https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer";
+      var fireExplorerURL = "https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Fire/FireExplorer_MS/MapServer";
       //var fireExplorerURL = "https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
       //var orthoURL = "http://helen2:6080/arcgis/rest/services/GISDivision/Guilford2014Ortho_IS/ImageServer"
       var orthoURL = "http://gis.co.guilford.nc.us/arcgis/rest/services/Basemaps/Guilford_2014_Orthos4Web_NAD83/MapServer"
@@ -85,12 +98,6 @@
         "opacity" : 1.0,
         "imageParameters" : imageParameters
       });
-
-      // var dynamicImageServiceLayer = new ArcGISImageServiceLayer(orthoURL, {
-      //   imageServiceParameters: imageServiceParams,
-      //   visible: false,
-      //   useMapImage: true
-      // });
 
       var tiledMapServiceLayer = new ArcGISTiledMapServiceLayer(orthoURL, {
         visible: false,
@@ -101,9 +108,13 @@
       map.on("load", mapReady);
 
   function mapReady () {
+    $("#measurementDiv").hide();
     $("#select").css("background-image", "url('images/CursorSelect.png')");
 
+    //map.setInfoWindowOnClick(false);
+
     map.on("click", executeIdentifyTask);
+
     //create identify tasks and setup parameters
     identifyTask = new IdentifyTask(fireExplorerURL);
     identifyParams = new IdentifyParameters();
@@ -117,13 +128,14 @@
   }
 
   function executeIdentifyTask (event) {
-    map.graphics.clear();
-    identifyParams.geometry = event.mapPoint;
-    identifyParams.mapExtent = map.extent;
+    if (isMeasureEnabled == false) {
+      map.graphics.clear();
+      identifyParams.geometry = event.mapPoint;
+      identifyParams.mapExtent = map.extent;
 
-    var deferred = identifyTask
-      .execute(identifyParams)
-      .addCallback(function (response) {
+      var deferred = identifyTask
+        .execute(identifyParams)
+        .addCallback(function (response) {
         //console.log(response);
         // response is an array of identify result objects
         // visibleResponse is an array of visible identify result objects
@@ -197,9 +209,15 @@
         });
       });
     }
+    else if (isMeasureEnabled == true) {
+      map.setInfoWindowOnClick(false);
+    }
+    }
     connect.connect(popup, "onHide", function() {
         map.graphics.clear();
     });
+
+
 
     //connect.connect(popup,"onSelectionChange",function() {
       // if (popup._highlighted.geometry.type != "point" && popup._highlighted._graphicsLayer.graphics.length > 1) {
@@ -258,7 +276,9 @@
          $("#zoomin").css("background-image", "url('images/ZoomInSelect.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
          $("#select").css("background-image", "url('images/Cursor.png')");
+         $("#measurement").css("background-image", "url('images/Measure.png')");
          map.setMapCursor("url('images/ZoomInCursor.png'), auto");
+         cleanMeasurementTool();
        });
 
        registry.byId("zoomout").on("click", function() {
@@ -266,20 +286,25 @@
          $("#zoomout").css("background-image", "url('images/ZoomOutSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
          $("#select").css("background-image", "url('images/Cursor.png')");
+         $("#measurement").css("background-image", "url('images/Measure.png')");
          map.setMapCursor("url('images/ZoomOutCursor.png'), auto");
+         cleanMeasurementTool();
        });
 
        registry.byId("zoomfullext").on("click", function() {
          //navToolbar.zoomToFullExtent();
          map.setExtent(startExtent);
+         cleanMeasurementTool();
        });
 
        registry.byId("zoomprev").on("click", function() {
          navToolbar.zoomToPrevExtent();
+         cleanMeasurementTool();
        });
 
        registry.byId("zoomnext").on("click", function() {
          navToolbar.zoomToNextExtent();
+         cleanMeasurementTool();
        });
 
        registry.byId("select").on("click", function() {
@@ -287,12 +312,34 @@
          $("#select").css("background-image", "url('images/CursorSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
+         $("#measurement").css("background-image", "url('images/Measure.png')");
          map.setMapCursor("default");
+         cleanMeasurementTool();
+       });
+
+       registry.byId("measurement").on("click", function() {
+         navToolbar.activate(Navigation.PAN);
+         $("#select").css("background-image", "url('images/Cursor.png')");
+         $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
+         $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
+         $("#measurement").css("background-image", "url('images/MeasureHighlight.png')");
+         map.setMapCursor("default");
+         measurement.setTool("distance", true);
+         $("#measurementDiv").show();
+         isMeasureEnabled = true;
        });
 
        function extentHistoryChangeHandler() {
          registry.byId("zoomprev").disabled = navToolbar.isFirstExtent();
          registry.byId("zoomnext").disabled = navToolbar.isLastExtent();
+       }
+
+       function cleanMeasurementTool() {
+         $("#measurementDiv").hide();
+         measurement.clearResult();
+         measurement.setTool("area", false);
+         measurement.setTool("distance", false);
+         isMeasureEnabled = false;
        }
        /*******************************************************************/
        /******************* END - NAVIGATION TOOLBAR **********************/
@@ -303,7 +350,7 @@
        /*******************************************************************/
       var itemSources = [
           {
-            featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer/10"),
+            featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Fire/FireExplorer_MS/MapServer/10"),
             searchFields: ["Hydrant_ID"],
             exactMatch: true,
             outFields: ["*"],
@@ -318,7 +365,7 @@
             //minCharacters: 0
           },
           {
-          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer/19"),
+          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Fire/FireExplorer_MS/MapServer/19"),
           searchFields: ["Tag"],
           //suggestionTemplate: "Grid: ${Tag}",
           exactMatch: true,
@@ -333,7 +380,7 @@
           //minCharacters: 0
         },
         {
-          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer/20"),
+          featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Fire/FireExplorer_MS/MapServer/20"),
           searchFields: ["REPORT"],
           exactMatch: true,
           outFields: ["*"],
@@ -451,7 +498,7 @@
       /*******************************************************************/
       /* TODO - UPGRADE to SEARCH Widget after 10.3.1 Upgrade */
        var geocoders = [{
-        url: "https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Geocoding/AllPoints_GCS/GeocodeServer",
+        url: "https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Geocoding/AllPoints_GCS/GeocodeServer",
         name: "All Points",
         placeholder: "Address Search"
       }];
@@ -532,7 +579,7 @@
   function getHydrantFlowData(callback) {
    return $.ajax({
       type: "GET",
-      url: "https://gis.greensboro-nc.gov/" + prodOrTest + "/rest/services/Fire/FireExplorer_MS/MapServer/40/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
+      url: "https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Fire/FireExplorer_MS/MapServer/40/query?where=hydr_gpm>0 and hydr_id='" + hydrantID + "'&outFields=*&f=json",
       success: callback
     });
   }
