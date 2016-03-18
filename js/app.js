@@ -55,10 +55,6 @@
 
       esriConfig.defaults.geometryService = new esri.tasks.GeometryService("https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Utilities/Geometry/GeometryServer");
 
-      // var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 10,
-      // new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID,
-      // new Color([255,0,0]), 1),
-      // new Color([0,255,0]));
       var pictureSymbol = new PictureMarkerSymbol('images/PointHighlight.png', 32, 32);
       var lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0,255,255, 0.8]), 3);
       var fillSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 255, 255, 0.8]), 2), new Color([0, 255, 255, 0.1]));
@@ -90,8 +86,6 @@
       var imageServiceParams = new ImageServiceParameters();
 
       var fireExplorerURL = "https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Fire/FireExplorer_MS/MapServer";
-      //var fireExplorerURL = "https://gis.greensboro-nc.gov/arcgis/rest/services/Fire/FireExplorer_MS/MapServer";
-      //var orthoURL = "http://helen2:6080/arcgis/rest/services/GISDivision/Guilford2014Ortho_IS/ImageServer"
       var orthoURL = "http://gis.co.guilford.nc.us/arcgis/rest/services/Basemaps/Guilford_2014_Orthos4Web_NAD83/MapServer"
 
       var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(fireExplorerURL, {
@@ -356,28 +350,17 @@
             outFields: ["*"],
             name: "Hydrant ID Query",
             highlightSymbol: pictureSymbol,
-            //labelSymbol: textSymbol,
             placeholder: "Hydrant ID - Ex: 009-093",
-            prefix: "HY",
-            //maxResults: 6,
-            //maxSuggestions: 6,
-            //enableSuggestions: true,
-            //minCharacters: 0
+            prefix: "HY"
           },
           {
           featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Fire/FireExplorer_MS/MapServer/19"),
           searchFields: ["Tag"],
-          //suggestionTemplate: "Grid: ${Tag}",
           exactMatch: true,
           outFields: ["*"],
           name: "City Grid Query",
           highlightSymbol: fillSymbol,
-          //labelSymbol:  textSymbol,
-          placeholder: "City Grid",
-          //maxResults: 6,
-          //maxSuggestions: 6,
-          //enableSuggestions: true,
-          //minCharacters: 0
+          placeholder: "City Grid"
         },
         {
           featureLayer: new FeatureLayer("https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Fire/FireExplorer_MS/MapServer/20"),
@@ -386,70 +369,55 @@
           outFields: ["*"],
           name: "FDZ Query",
           highlightSymbol: fillSymbol,
-          //labelSymbol: textSymbol,
           placeholder: "FDZ",
-          //maxResults: 6,
-          //maxSuggestions: 6,
-          enableSuggestions: true,
-          //minCharacters: 0
+          enableSuggestions: true
         }
       ];
 
       var searchItem = new Search({
         map: map,
         sources: itemSources,
-        //enableSuggestions: true,
         enableHighlight: true,
         allPlaceholder: "Search All",
         zoomScale: 5000,
         showInfoWindowOnSelect: false
-        //enableButtonMode: true
       },"featureSearch");
       searchItem.startup();
 
       searchItem.on("search-results", function(e) {
         if (searchItem.activeSource.name == "Hydrant ID Query") {
-          //console.log(searchItem.activeSource);
           if (dynamicMapServiceLayer.layerInfos[10].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
-            //console.log(inputs);
             var visible = [10];
             for (var i = 1; i < inputs.length; i++) {
               if (inputs[i].checked) {
                 visible.push(i - 1);
               }
             }
-            //console.log(visible);
             dynamicMapServiceLayer.setVisibleLayers(visible);
           }
         }
         else if (searchItem.activeSource.name == "City Grid Query") {
-          //console.log(searchItem.activeSource);
           if (dynamicMapServiceLayer.layerInfos[19].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
-            //console.log(inputs);
             var visible = [19];
             for (var i = 1; i < inputs.length; i++) {
               if (inputs[i].checked) {
                 visible.push(i - 1);
               }
             }
-            //console.log(visible);
             dynamicMapServiceLayer.setVisibleLayers(visible);
           }
         }
         else if (searchItem.activeSource.name == "FZD Query") {
-          //console.log(searchItem.activeSource);
           if (dynamicMapServiceLayer.layerInfos[20].visible == false) {
             var inputs = query(".agsjsTOCNode input[type='checkbox']");
-            //console.log(inputs);
             var visible = [20];
             for (var i = 1; i < inputs.length; i++) {
               if (inputs[i].checked) {
                 visible.push(i - 1);
               }
             }
-            //console.log(visible);
             dynamicMapServiceLayer.setVisibleLayers(visible);
           }
         }
@@ -514,13 +482,11 @@
        geocoder.startup();
 
      geocoder.on("select", function(response) {
-       //console.log(response.result.name);
        $.ajax({
         url: "http://gisapps.greensboronc.org/GsoGeoService/api/PointInPoly?x=" + response.result.feature.geometry.x + "&y=" + response.result.feature.geometry.y + "&l=5",
         jsonp: "callback",
         dataType: "jsonp",
         success: function(result) {
-          //console.log(result);
           $(".drillStationResults").hide();
 
           $("#searchPrompt").html("<strong>" + response.result.name + ":</strong>");
