@@ -107,6 +107,13 @@ a:active {
     height:100%;
 }
 
+#measurementDiv {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #fff;
+  border: 1px solid black;
+}
+
 #stationsToggle {
   cursor: pointer;
 }
@@ -181,6 +188,16 @@ a:active {
  background-image: url("../images/Cursor.png");
  background-repeat: no-repeat;
 }
+
+#measurement {
+  background-image: url("../images/Measure.png");
+  background-repeat: no-repeat;
+}
+
+#measurement:hover {
+  background-image: url("../images/MeasureHighlight.png");
+}
+
 
 /*#deactivate {
  background-image: url("../images/Clear.png");
