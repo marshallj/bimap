@@ -1,0 +1,20 @@
+{
+  "name": "bimap",
+  "version": "1.0.0",
+  "description": "Building Inspections Map",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ".git"
+  },
+  "keywords": [
+    "greensboro",
+    "building",
+    "inspections"
+  ],
+  "author": "Jason Marshall",
+  "license": "MIT"
+}

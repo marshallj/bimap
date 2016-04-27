@@ -10,13 +10,21 @@ html, body {
   color: #E4CBB5;
 }
 
-#gfdPatch {
+#gsoLogo {
   float: left;
 }
 
-#fireLinks {
+#navTools {
   float: right;
   font-size: 1.1em;
+}
+
+.black {
+  color: #000;
+}
+
+.tan {
+  color: #E4CBB5;
 }
 
 *:focus {
@@ -43,15 +51,19 @@ a:active {
     text-decoration: underline;
 }
 
+.calcite.nav-position-top .esriSimpleSlider {
+  margin-top: 100px !important;
+}
+
 #borderContainer {
     width: 100%;
     height: 100%;
 }
 
 /* FIRE DRILL DOWN TABLE STYLES */
-#drillDownResult {
+/*#drillDownResult {
     display: none;
-}
+}*/
 
 #searchPrompt {
   font-size: 1.0em;
@@ -63,7 +75,14 @@ a:active {
 
 .drillDownResults {
   margin: 3px;
+  font-size: 12px;
 }
+
+.drillDownResults input[type='text'] {
+  border: none;
+  background: transparent;
+}
+
 /* END - FIRE DRILL DOWN TABLE STYLES */
 
 #stationsToggle {
@@ -74,8 +93,8 @@ a:active {
 #header {
   background-color: darkred;
   background-size: 110% 100%;
-  background-image: url("../images/TitleBanner.png");
-  background-repeat: no-repeat;
+  /*background-image: url("../images/TitleBanner.png");*/
+  /*background-repeat: no-repeat;*/
   /*background-size: cover;*/
 }
 
@@ -106,124 +125,137 @@ a:active {
 #mapDiv {
     height:100%;
 }
+.measureContainer {
+  height: 100px;
+  width: 160px;
+  position: absolute;
+  right: 40px;
+  top: 100px;
+}
 
-#measurementDiv {
+/*#measurementDiv {
   padding: 5px;
   border-radius: 5px;
   background-color: #fff;
   border: 1px solid black;
+}*/
+
+
+#measurementDiv {
+  height: 300px;
+  width: 500px;
+  position: absolute;
+  right: 40px;
+  top: 100px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #fff;
+  border: 1px solid black;
+  z-Index:999;
 }
 
-#stationsToggle {
-  cursor: pointer;
+#collapseToc {
+  padding-left: 10px;
 }
 
-.claro .dijitButton .dijitButtonNode {
+#mainResult {
+  color: white;
+}
+
+/*.panel-container {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}*/
+
+.panel {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/*.panel-group {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}*/
+
+/*.panel-collapse {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}*/
+
+.fixed-panel {
+  height: 90%;
+  overflow-y: scroll;
+}
+
+.btn-tool {
+  width: 42px;
+  height: 42px;
+  background-repeat: no-repeat;
   background-color: transparent !important;
-  background-image: none !important;
   border: none !important;
   box-shadow: none !important;
   border-radius: 0 !important;
 }
 
-.navButton {
-  width: 16px;
-  height: 16px;
-  margin: 12px;
-}
-
-.icon {
-  width: 32px;
-  height: 32px;
-}
-
-#zoomin {
+.icon-zoomin {
  background-image: url("../images/ZoomIn.png");
- background-repeat: no-repeat;
 }
 
-#zoomout {
+.icon-zoomout {
  background-image: url("../images/ZoomOut.png");
- background-repeat: no-repeat;
 }
 
-#zoomin {
- background-image: url("../images/ZoomIn.png");
- background-repeat: no-repeat;
-}
-
-#zoomout {
- background-image: url("../images/ZoomOut.png");
- background-repeat: no-repeat;
-}
-
-#zoomfullext {
+.icon-zoomfullext {
  background-image: url("../images/ZoomFull.png");
- background-repeat: no-repeat;
 }
 
-#zoomfullext:hover {
+.icon-zoomfullext:hover {
  background-image: url("../images/ZoomFullHighlight.png");
 }
 
-#zoomprev {
+.icon-zoomprev {
  background-image: url("../images/PrevExtent.png");
- background-repeat: no-repeat;
 }
 
-#zoomprev:hover {
+.icon-zoomprev:hover {
   background-image: url("../images/PrevExtentHighlight.png");
 }
 
-#zoomnext {
+.icon-zoomnext {
  background-image: url("../images/NextExtent.png");
- background-repeat: no-repeat;
 }
 
-#zoomnext:hover {
+.icon-zoomnext:hover {
   background-image: url("../images/NextExtentHighlight.png");
 }
 
-#select {
+.icon-select {
  background-image: url("../images/Cursor.png");
- background-repeat: no-repeat;
 }
 
-#measurement {
+.icon-measurement {
   background-image: url("../images/Measure.png");
-  background-repeat: no-repeat;
 }
 
-#measurement:hover {
+.icon-measurement {
+  background-image: url("../images/Measure.png");
+}
+
+.icon-measurement:hover {
   background-image: url("../images/MeasureHighlight.png");
 }
 
-
-/*#deactivate {
- background-image: url("../images/Clear.png");
- background-repeat: no-repeat;
-}
-
-#deactivate:hover {
- background-image: url("../images/ClearHighlight.png");
+/* Collapse into a single border */
+/*table {
+    margin: 5px;
 }*/
 
-/* Collapse into a single border */
-table {
-    border-collapse: collapse;
-    margin: 5px;
-}
-
-table, th, td {
+/*table, th, td {
    border: 1px solid black;
 }
 
 /* Place padding around content */
-th, td {
+/*th, td {
     padding: 0px 5px;
     text-align: left;
 }
 
 th {
   background-color: #aaa;
-}
+}*/

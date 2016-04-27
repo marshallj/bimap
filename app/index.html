@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Building Inspections Map</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <!--The viewport meta tag is used to improve the presentation and behavior of the samples
+      on iOS devices-->
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+
+
+
+  <link rel="stylesheet" type="text/css" href="styles/calcite-maps-bootstrap-arcgis-3.x.min.css">
+  <!-- <link rel="stylesheet" href="https://js.arcgis.com/3.16/dijit/themes/claro/claro.css"/>
+  <link rel="stylesheet" href="https://js.arcgis.com/3.16/esri/css/esri.css"/> -->
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.16/esri/themes/calcite/dijit/calcite.css"/>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/3.16/esri/themes/calcite/esri/esri.css"/>
+
+  <!-- TODO: DEV ONLY! -->
+  <link rel="stylesheet" type="text/css" href="http://esri.github.io/calcite-bootstrap/assets/css/calcite-bootstrap-open.min.css">
+
+  <link rel="stylesheet" type="text/css" href="components/agsjs/css/agsjs.css"/>
+  <link rel="stylesheet" type="text/css" href="styles/style.css"/>
+
+</head>
+<body class="calcite calcite-maps map-position-absolute nav-position-top nav-space-none zoom-top-right panel-left">
+  <nav id="nav" class="navbar navbar-text-light navbar-fixed-top calcite-dark-green">
+        <div class="container-fluid">
+            <div class="navbar-header">
+              <div class="navbar-info">
+                  <div class="navbar-title text-overflow" data-toggle="modal" data-target="#modalSplash">City of Greensboro</div>
+                  <div class="navbar-subtitle text-overflow">Building Inspections</div>
+              </div>
+                <!-- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mainNav" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand">
+                    <span class="glyphicon glyphicon-map-marker"></span>
+                </a> -->
+            </div>
+            <!-- Navbar collapse -->
+            <div id="mainNav" class="collapse navbar-collapse" aria-expanded="false">
+              <div id="navTools">
+                <p>
+                  <a href="http://greensboro-nc.gov" target="_blank">Greensboro Home</a> | <a href="http://citynet/Pages/default.aspx" target="_blank">CityNet</a> | <a href="http://gisimages.greensboro-nc.gov/GSOMapGallery/" target="_blank">GIS Map Gallery</a>
+                </p>
+                <div id="toolbar">
+                  <div id="navButtons">
+                    <button id="zoomin" class='btn-tool icon-zoomin' data-toggle='tooltip' title='Zoom In' type="button"></button>
+                    <button id="zoomout" class='btn-tool icon-zoomout' data-toggle='tooltip' title='Zoom Out' type="button"></button>
+                    <button id="select" class='btn-tool icon-select' data-toggle='tooltip' title='Select' type="button"></button>
+                    <button id="zoomfullext" class='btn-tool icon-zoomfullext' data-toggle='tooltip' title='Full Extent' type="button"></button>
+                    <button id="zoomprev" class='btn-tool icon-zoomprev' data-toggle='tooltip' title='Previous Extent' type="button"></button>
+                    <button id="zoomnext" class='btn-tool icon-zoomnext' data-toggle='tooltip' title='Next Extent' type="button"></button>
+                    <button id="measurement" class='btn-tool icon-measurement' data-toggle='tooltip' title='Measurement Tool' type="button"></button>
+                  </div>
+                </div>
+              </div> <!-- /navTools -->
+            </div> <!--/.nav-collapse -->
+        </div> <!--/.container-fluid -->
+    </nav> <!--/.navbar -->
+
+    <!-- Panel Container -->
+    <div class="panel-container fixed-panel">
+      <div id="panelAccordion" class="panel-group" role="tablist" aria-multiselectable="true">
+        <div id="panelDrill" class="panel">
+          <div id="headingDrill" class="panel-heading" role="tab">
+            <div class="panel-title">
+              <a class="panel-toggle" role="button" data-toggle="collapse" href="#collapseDrill" aria-expanded="true" aria-controls="collapseDrill">
+                BI Drill Down
+              </a>
+            </div>
+          </div>
+          <div id="collapseDrill" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingDrill">
+            <div id="drillDownResult" class="panel-body">
+              <table id="mainResult" class="table-condensed">
+                <tr>
+                  <td id="inCityLabel" class="drillDownResults">Inside City:</td>
+                  <td id="inCityResult" class="drillDownResults"><input id="inCityText" type="text" readOnly></td>
+                </tr>
+                <tr>
+                  <td id="floodLabel" class="drillDownResults">Floodplain:</td>
+                  <td id="floodResult" class="drillDownResults"><input id="floodText" type="text" readOnly></td>
+                </tr>
+                <tr>
+                  <td id="locHistLabel" class="drillDownResults">Local Hist. District:</td>
+                  <td id="locHistResult" class="drillDownResults"><input id="locHistText" type="text" readOnly></td>
+                </tr>
+                <tr>
+                  <td id="natHistLabel" class="drillDownResults">Nat Hist. District:</td>
+                  <td id="natHistResult" class="drillDownResults"><input id="natHistText" type="text" readOnly></td>
+                </tr>
+                <tr>
+                  <td id="overlayLabel" class="drillDownResults">Overlay District:</td>
+                  <td id="overalyResult" class="drillDownResults"><input id="overlayText" type="text" readOnly></td>
+                </tr>
+                <tr>
+                  <td id="landmarkLabel" class="drillDownResults">Landmark Property:</td>
+                  <td id="landmarkResult" class="drillDownResults"><input id="landmarkText" type="text" readOnly></td>
+                </tr>
+                <tr>
+                  <td id="zoningLabel" class="drillDownResults">Zoning:</td>
+                  <td id="zoningResult" class="drillDownResults"><input id="zoningText" type="text" readOnly></td>
+                </tr>
+                <tr>
+                  <td id="blockLabel" class="drillDownResults">Blocksheet:</td>
+                  <td id="blockResult" class="drillDownResults"><input id="blockText" type="text" readOnly></td>
+                </tr>
+                <tr>
+                  <td id="censusLabel" class="drillDownResults">Census Tract:</td>
+                  <td id="censusResult" class="drillDownResults"><input id="censusText" type="text" readOnly></td>
+                </tr>
+                <tr>
+                  <td id="annexLabel" class="drillDownResults">Date Annexed:</td>
+                  <td id="annexResult" class="drillDownResults"><input id="annexText" type="text" readOnly></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading" role="tab" id="headingResults">
+            <div class="panel-title">
+              <a class="panel-toggle" role="button" data-toggle="collapse" href="#collapseResults" aria-expanded="false" aria-controls="collapseResults">
+                Results
+              </a>
+            </div>
+          </div>
+          <div id="collapseResults" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingResults">
+            Test
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading" role="tab" id="headingToc">
+            <div class="panel-title">
+              <a class="panel-toggle" role="button" data-toggle="collapse" href="#collapseToc" aria-expanded="true" aria-controls="collapseToc">
+                Map Contents
+              </a>
+            </div>
+          </div>
+          <div id="collapseToc" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingToc">
+            <div id="tocDiv"></div>
+            <div id="tocDivOrtho"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Panel Container -->
+
+
+    <!-- Map Container  -->
+   <div class="map-container">
+     <div id="mapDiv" class="map-position-absolute">
+       <!-- <div class="measureContainer"> -->
+       <!-- <div style="position:absolute; right:20px; top:200px; z-Index:999;"> -->
+         <div id="measurementDiv"></div>
+      <!-- </div> -->
+       <!-- </div> -->
+     </div>
+   </div>
+
+   <script type="text/javascript">
+     var dojoConfig = {
+      parseOnLoad: true,
+   		packages: [{
+   						name: "bootstrap",
+   						location: location.pathname.replace(/\/[^/]+$/, "") + "/../components/dojo-bootstrap"
+   		},
+   		{
+   						name: "calcite-maps",
+   						location: location.pathname.replace(/\/[^/]+$/, "") + "/../components/dojo"
+   		}],
+       paths: {
+         //if you want to host on your own server, download and put in folders then use path like:
+               agsjs: location.pathname.replace(/\/[^/]+$/, '') + '/../components/agsjs'
+           }
+     };
+   </script>
+
+  <script src="https://js.arcgis.com/3.16/"></script>
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+  <script src="http://esri.github.io/calcite-bootstrap/assets/js/bootstrap.min.js"></script>
+
+  <script src="scripts/main.js"></script>
+</body>
+</html>
