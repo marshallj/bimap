@@ -89,8 +89,8 @@
       });
 
       var queryParams = $.getQueryParameters();
-      console.log(queryParams);
-      console.log(decodeURIComponent(queryParams.AnnexDate));
+      // console.log(queryParams);
+      // console.log(decodeURIComponent(queryParams.AnnexDate));
 
       var addressSakey = Number(queryParams.AddrID),
           inCity = queryParams.City,
@@ -141,42 +141,88 @@
       /*************************** AJAX Promise **************************/
       /*******************************************************************/
 
-      function getAddressCoords() {
-        return $.ajax({
-          url: 'http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json'
-        })
-      }
+      var gettingGISData = {
+        coords: function () {
+          return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json').then(function(xyCoords) {
+            return xyCoords;
+          });
+        },
+        parcel: function (coords) {
+          return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json').then(function(parcel) {
+            return parcel;
+          });
+        }
+      };
 
-      function getParcelFeature() {
-        return $.ajax({
-          url: 'http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json'
-        })
-      }
+      // function gettingParcelFeature() {
+      //   return $.ajax({
+      //     url: 'http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json'
+      //   });
+      // }
 
-      if (addressSakey) {
-        console.log(addressSakey);
-        $.when(getAddressCoords().done(function(result) {
-            var resultObj = $.parseJSON(result);
-            console.log(resultObj);
-            var x = resultObj.features[0].geometry.x,
-                y = resultObj.features[0].geometry.y;
-            coords = [ x, y ];
-            console.log(coords);
-            addrCoords = new Point( coords, new esri.SpatialReference({wkid:2264}) );
-        }).then(function(){
-          getParcelFeature().done(function(result) {
-            var resultObj = $.parseJSON(result);
-            console.log(resultObj.features[0].geometry.rings[0]);
-            polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
-          })
-        })).done(function() {
-          pointGraphic = new Graphic(addrCoords, markerSymbol);
-          polygonGraphic = new Graphic(polygonFeature, fillSymbol);
-          map.centerAndZoom(addrCoords, 11);
-          map.graphics.add(pointGraphic);
-          map.graphics.add(polygonGraphic);
-        });
-      }
+      gettingGISData.coords().done(function(result) {
+        var resultObj = $.parseJSON(result);
+        // console.log(resultObj);
+        var x = resultObj.features[0].geometry.x,
+            y = resultObj.features[0].geometry.y;
+        coords = [ x, y ];
+        console.log(coords);
+        addrCoords = new Point( coords, new esri.SpatialReference({wkid:2264}) );
+        console.log("1 - get address coords");
+        console.log(addrCoords);
+        gettingGISData.parcel(coords).done(function(result) {
+          var resultObj = $.parseJSON(result);
+          console.log(resultObj.features[0].geometry.rings[0]);
+          polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
+          console.log("2 - get parcel feature");
+        }).done(function() {
+            pointGraphic = new Graphic(addrCoords, markerSymbol);
+            polygonGraphic = new Graphic(polygonFeature, fillSymbol);
+            map.centerAndZoom(addrCoords, 11);
+            map.graphics.add(pointGraphic);
+            map.graphics.add(polygonGraphic);
+            console.log("3 - done")
+        })
+      });
+
+
+      // .done(gettingGISData.parcel(coords)).then(function(result) {
+      //    var resultObj = $.parseJSON(result);
+      //    console.log(resultObj.features[0].geometry.rings[0]);
+      //    polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
+      //    console.log("2 - get parcel feature");
+      //   }
+      // );
+
+
+
+      // if (addressSakey) {
+      //   console.log(addressSakey);
+      //   $.when(getAddressCoords().done(function(result) {
+      //       var resultObj = $.parseJSON(result);
+      //       // console.log(resultObj);
+      //       var x = resultObj.features[0].geometry.x,
+      //           y = resultObj.features[0].geometry.y;
+      //       coords = [ x, y ];
+      //       // console.log(coords);
+      //       addrCoords = new Point( coords, new esri.SpatialReference({wkid:2264}) );
+      //       console.log("1 - get address coords");
+      //   }).done(function(){
+      //     getParcelFeature().done(function(result) {
+      //       var resultObj = $.parseJSON(result);
+      //       // console.log(resultObj.features[0].geometry.rings[0]);
+      //       polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
+      //       console.log("2 - get parcel feature");
+      //     })
+      //   })).done(function() {
+      //     pointGraphic = new Graphic(addrCoords, markerSymbol);
+      //     polygonGraphic = new Graphic(polygonFeature, fillSymbol);
+      //     map.centerAndZoom(addrCoords, 11);
+      //     map.graphics.add(pointGraphic);
+      //     map.graphics.add(polygonGraphic);
+      //     console.log("3 - done");
+      //   });
+      // }
       // else {
       //   // extent = new Extent(1659734.28936683, 791324.824158028, 1867556.626367224, 915192.442237733, new esri.SpatialReference({wkid:2264}) );
       // }
