@@ -27,6 +27,10 @@ html, body {
   color: #E4CBB5;
 }
 
+.gray {
+  color: #bbb;
+}
+
 *:focus {
     outline: none;
 }
@@ -34,17 +38,18 @@ html, body {
 a:link {
     text-decoration: none;
     /*color: #aaa;*/
-    color: #ddd;
+    color: #fff;
 }
 
 a:visited {
     text-decoration: none;
     /*color: #aaa;*/
-    color: #ddd;
+    color: #fff;
 }
 
 a:hover {
-    color: #E4CBB5;
+    /*color: #E4CBB5;*/
+    color: #ddd;
 }
 
 a:active {
@@ -125,6 +130,7 @@ a:active {
 #mapDiv {
     height:100%;
 }
+
 .measureContainer {
   height: 100px;
   width: 160px;
@@ -142,16 +148,18 @@ a:active {
 
 
 #measurementDiv {
+  /*display: none;*/
   height: 300px;
   width: 500px;
-  position: absolute;
-  right: 40px;
+  display: block;
+  /*position: absolute;
+  right: 50px;
   top: 100px;
-  padding: 5px;
-  border-radius: 5px;
+  padding: 5px;*/
+  /*border-radius: 5px;
   background-color: #fff;
-  border: 1px solid black;
-  z-Index:999;
+  border: 1px solid black;*/
+  z-Index:1000;
 }
 
 #collapseToc {
@@ -183,6 +191,92 @@ a:active {
   overflow-y: scroll;
 }
 
+.calcite .dijitButtonNode {
+  background-color: transparent !important;
+  background-image: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.calcite .dijitButtonContents {
+  width: 42px;
+  height: 42px;
+  background-repeat: no-repeat;
+}
+/*
+.navButton {
+  width: 16px;
+  height: 16px;
+  margin: 12px;
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+}
+
+#zoomin {
+ background-image: url("../images/ZoomIn.png");
+ background-repeat: no-repeat;
+}
+
+#zoomout {
+ background-image: url("../images/ZoomOut.png");
+ background-repeat: no-repeat;
+}
+
+#zoomin {
+ background-image: url("../images/ZoomIn.png");
+ background-repeat: no-repeat;
+}
+
+#zoomout {
+ background-image: url("../images/ZoomOut.png");
+ background-repeat: no-repeat;
+}
+
+#zoomfullext {
+ background-image: url("../images/ZoomFull.png");
+ background-repeat: no-repeat;
+}
+
+#zoomfullext:hover {
+ background-image: url("../images/ZoomFullHighlight.png");
+}
+
+#zoomprev {
+ background-image: url("../images/PrevExtent.png");
+ background-repeat: no-repeat;
+}
+
+#zoomprev:hover {
+  background-image: url("../images/PrevExtentHighlight.png");
+}
+
+#zoomnext {
+ background-image: url("../images/NextExtent.png");
+ background-repeat: no-repeat;
+}
+
+#zoomnext:hover {
+  background-image: url("../images/NextExtentHighlight.png");
+}
+
+#select {
+ background-image: url("../images/Cursor.png");
+ background-repeat: no-repeat;
+}
+
+#measurement {
+  background-image: url("../images/Measure.png");
+  background-repeat: no-repeat;
+}
+
+#measurement:hover {
+  background-image: url("../images/MeasureHighlight.png");
+}*/
+
 .btn-tool {
   width: 42px;
   height: 42px;
@@ -195,6 +289,7 @@ a:active {
 
 .icon-zoomin {
  background-image: url("../images/ZoomIn.png");
+ background-repeat: no-repeat;
 }
 
 .icon-zoomout {

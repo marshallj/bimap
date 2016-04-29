@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Building Inspections Map</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <!--The viewport meta tag is used to improve the presentation and behavior of the samples
       on iOS devices-->
   <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
 
-
+  <title>Building Inspections Map</title>
 
   <link rel="stylesheet" type="text/css" href="styles/calcite-maps-bootstrap-arcgis-3.x.min.css">
   <!-- <link rel="stylesheet" href="https://js.arcgis.com/3.16/dijit/themes/claro/claro.css"/>
@@ -49,13 +48,20 @@
                 </p>
                 <div id="toolbar">
                   <div id="navButtons">
-                    <button id="zoomin" class='btn-tool icon-zoomin' data-toggle='tooltip' title='Zoom In' type="button"></button>
-                    <button id="zoomout" class='btn-tool icon-zoomout' data-toggle='tooltip' title='Zoom Out' type="button"></button>
-                    <button id="select" class='btn-tool icon-select' data-toggle='tooltip' title='Select' type="button"></button>
-                    <button id="zoomfullext" class='btn-tool icon-zoomfullext' data-toggle='tooltip' title='Full Extent' type="button"></button>
-                    <button id="zoomprev" class='btn-tool icon-zoomprev' data-toggle='tooltip' title='Previous Extent' type="button"></button>
-                    <button id="zoomnext" class='btn-tool icon-zoomnext' data-toggle='tooltip' title='Next Extent' type="button"></button>
-                    <button id="measurement" class='btn-tool icon-measurement' data-toggle='tooltip' title='Measurement Tool' type="button"></button>
+                    <!-- <button id="zoomin" class='btn-tool icon-zoomin' data-toggle='tooltip' title='Zoom In' data-dojo-type="dijit/form/Button" type="button"></button>
+                    <button id="zoomout" class='btn-tool icon-zoomout' data-toggle='tooltip' title='Zoom Out' data-dojo-type="dijit/form/Button" type="button"></button>
+                    <button id="select" class='btn-tool icon-select' data-toggle='tooltip' title='Select' data-dojo-type="dijit/form/Button" type="button"></button>
+                    <button id="zoomfullext" class='btn-tool icon-zoomfullext' data-toggle='tooltip' title='Full Extent' data-dojo-type="dijit/form/Button" type="button"></button>
+                    <button id="zoomprev" class='btn-tool icon-zoomprev' data-toggle='tooltip' title='Previous Extent' data-dojo-type="dijit/form/Button" type="button"></button>
+                    <button id="zoomnext" class='btn-tool icon-zoomnext' data-toggle='tooltip' title='Next Extent' data-dojo-type="dijit/form/Button" type="button"></button>
+                    <button id="measurement" class='btn-tool icon-measurement' data-toggle='tooltip' title='Measurement Tool' data-dojo-type="dijit/form/Button" type="button"></button> -->
+                    <button id="zoomin" class="btn-tool icon-zoomin" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+                    <button id="zoomout" class="btn-tool icon-zoomout" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+                    <button id="select" class="btn-tool icon-select" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+                    <button id="zoomfullext" class="btn-tool icon-zoomfullext" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+                    <button id="zoomprev" class="btn-tool icon-zoomprev" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+                    <button id="zoomnext" class="btn-tool icon-zoomnext" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
+                    <button id="measurement" class="btn-tool icon-measurement" data-dojo-type="dijit/form/Button" iconClass="icon" type="button"></button>
                   </div>
                 </div>
               </div> <!-- /navTools -->
@@ -66,7 +72,7 @@
     <!-- Panel Container -->
     <div class="panel-container fixed-panel">
       <div id="panelAccordion" class="panel-group" role="tablist" aria-multiselectable="true">
-        <div id="panelDrill" class="panel">
+        <div id="panelDrill" class="panel ca">
           <div id="headingDrill" class="panel-heading" role="tab">
             <div class="panel-title">
               <a class="panel-toggle" role="button" data-toggle="collapse" href="#collapseDrill" aria-expanded="true" aria-controls="collapseDrill">
@@ -152,19 +158,22 @@
 
 
     <!-- Map Container  -->
-   <div class="map-container">
-     <div id="mapDiv" class="map-position-absolute">
-       <!-- <div class="measureContainer"> -->
-       <!-- <div style="position:absolute; right:20px; top:200px; z-Index:999;"> -->
-         <div id="measurementDiv"></div>
-      <!-- </div> -->
-       <!-- </div> -->
+   <div class="map-container" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false" style="width:100%; height:100%;">
+     <div id="mapDiv" class="map-position-absolute" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+       <!-- <div id="measureContainer"> -->
+        <div style="position:absolute; right:50px; top:100px; height:300px; width:500px; z-Index:999;">
+          <div id="titlePane" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Measurement', closable:false, open:false">
+            <div id="measurementDiv"></div>
+            <span style="font-size:smaller;padding:5px 5px;">Press <b>CTRL</b> to enable snapping.</span>
+          </div>
+       </div>
+     <!-- </div> -->
      </div>
    </div>
 
    <script type="text/javascript">
      var dojoConfig = {
-      parseOnLoad: true,
+      parseOnLoad: false,
    		packages: [{
    						name: "bootstrap",
    						location: location.pathname.replace(/\/[^/]+$/, "") + "/../components/dojo-bootstrap"
@@ -182,8 +191,7 @@
 
   <script src="https://js.arcgis.com/3.16/"></script>
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="http://esri.github.io/calcite-bootstrap/assets/js/bootstrap.min.js"></script>
 
   <script src="scripts/main.js"></script>

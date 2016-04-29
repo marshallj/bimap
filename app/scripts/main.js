@@ -1,19 +1,21 @@
   require([
+    "dojo/dom",
+    "dojo/_base/Color",
     "esri/map",
     "esri/geometry/Extent",
     "esri/geometry/Point",
     "esri/geometry/Polygon",
     "agsjs/dijit/TOC",
     "esri/layers/ArcGISDynamicMapServiceLayer",
+    "esri/layers/ArcGISImageServiceLayer",
+    "esri/layers/ImageServiceParameters",
     "esri/layers/ArcGISTiledMapServiceLayer",
+    "esri/layers/RasterLayer",
     "esri/layers/ImageParameters",
     "esri/toolbars/navigation",
-    "dojo/dom",
     "dojo/parser",
-    "dojo/on",
-    "dojo/dom-construct",
-    "dojo/_base/Color",
     "dijit/registry",
+    "dojo/on",
     "esri/dijit/Geocoder",
     "esri/tasks/locator",
     "esri/dijit/Search",
@@ -30,17 +32,32 @@
     "esri/dijit/Measurement",
     "esri/config",
     "dojo/_base/array",
+    "dojo/dom-construct",
     "dojo/query",
     "dojo/_base/connect",
+    "dijit/TitlePane",
+    "dijit/layout/BorderContainer",
+    "dijit/layout/ContentPane",
+    "dojo/fx",
+    "dijit/form/Button",
+    "dijit/layout/AccordionContainer",
+    "dijit/layout/AccordionPane",
+
+    "dijit/layout/BorderContainer",
+    "dijit/layout/ContentPane",
+    "dijit/TitlePane",
+
     // "bootstrap/Collapse",
 		// "bootstrap/Dropdown",
 		// "bootstrap/Tab",
 		"bootstrap/Tooltip",
 
-		"calcite-maps/calcitemaps",
+		// "calcite-maps/calcitemaps",
     "dojo/domReady!"
-  ], function (Map, Extent, Point, Polygon, TOC, ArcGISDynamicMapServiceLayer, ArcGISTiledMapServiceLayer, ImageParameters, Navigation, dom, parser, on, domConstruct, Color, registry, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
-        SimpleLineSymbol, SimpleMarkerSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, Graphic, Measurement, esriConfig, arrayUtils, query, connect) {
+  ], function (dom, Color, Map, Extent, Point, Polygon, TOC, ArcGISDynamicMapServiceLayer, ArcGISImageServiceLayer, ImageServiceParameters, ArcGISTiledMapServiceLayer, RasterLayer, ImageParameters, Navigation, parser, registry, onDojo, Geocoder, Locator, Search, FeatureLayer, InfoTemplate, SimpleFillSymbol,
+        SimpleLineSymbol, SimpleMarkerSymbol, PictureMarkerSymbol, IdentifyTask, IdentifyParameters, Popup, Graphic, Measurement, esriConfig, arrayUtils, domConstruct, query, connect) {
+
+      parser.parse();
 
       /******* Update with "arcgis" for production and update with "test" for test ********/
       var webAdaptor = "arcgis";
@@ -60,7 +77,7 @@
       var lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0,255,255, 0.8]), 3);
       var fillSymbol = new SimpleFillSymbol(SimpleFillSymbol.STYLE_SOLID, new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 255, 255, 0.8]), 2), new Color([0, 255, 255, 0.1]));
 
-      parser.parse();
+
 
       /*******************************************************************/
       /*************************** QueryParams ***************************/
@@ -120,6 +137,10 @@
         infoWindow: popup
       });
 
+      /*******************************************************************/
+      /*************************** AJAX Promise **************************/
+      /*******************************************************************/
+
       function getAddressCoords() {
         return $.ajax({
           url: 'http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json'
@@ -160,11 +181,15 @@
       //   // extent = new Extent(1659734.28936683, 791324.824158028, 1867556.626367224, 915192.442237733, new esri.SpatialReference({wkid:2264}) );
       // }
 
+      /*******************************************************************/
+      /*************************** AJAX Promise **************************/
+      /*******************************************************************/
+
       var measurement = new Measurement({
         map: map
       }, dom.byId("#measurementDiv"));
       measurement.startup();
-      measurement.hideTool("location");
+      // measurement.hideTool("location");
 
       var imageParameters = new ImageParameters();
       imageParameters.format = "jpeg"; //set the image type to PNG24, note default is PNG8.
@@ -186,8 +211,8 @@
       map.on("load", mapReady);
 
   function mapReady () {
-    $("#measurementDiv").hide();
-    // $("#select").css("background-image", "url('images/CursorSelect.png')");
+    // $("#measurementDiv").hide();
+    $("#select").css("background-image", "url('images/CursorSelect.png')");
 
     //map.setInfoWindowOnClick(false);
 
@@ -353,9 +378,9 @@
       /********************** NAVIGATION TOOLBAR *************************/
       /*******************************************************************/
       navToolbar = new Navigation(map);
-       on(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
+       onDojo(navToolbar, "onExtentHistoryChange", extentHistoryChangeHandler);
 
-       $("#zoomin").click(function() {
+       registry.byId("zoomin").on("click", function() {
          navToolbar.activate(Navigation.ZOOM_IN);
          $("#zoomin").css("background-image", "url('images/ZoomInSelect.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
@@ -365,7 +390,7 @@
          cleanMeasurementTool();
        });
 
-       $("#zoomout").click(function() {
+       registry.byId("zoomout").on("click", function() {
          navToolbar.activate(Navigation.ZOOM_OUT);
          $("#zoomout").css("background-image", "url('images/ZoomOutSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
@@ -375,33 +400,34 @@
          cleanMeasurementTool();
        });
 
-       $("#zoomfullext").click(function() {
+       registry.byId("zoomfullext").on("click", function() {
          //navToolbar.zoomToFullExtent();
          map.setExtent(extent);
          cleanMeasurementTool();
        });
 
-       $("#zoomprev").click(function() {
+       registry.byId("zoomprev").on("click", function() {
          navToolbar.zoomToPrevExtent();
          cleanMeasurementTool();
        });
 
-       $("#zoomnext").click(function() {
+       registry.byId("zoomnext").on("click", function() {
          navToolbar.zoomToNextExtent();
          cleanMeasurementTool();
        });
 
-       $("#select").click(function() {
+       registry.byId("select").on("click", function() {
          navToolbar.activate(Navigation.PAN);
          $("#select").css("background-image", "url('images/CursorSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
          $("#measurement").css("background-image", "url('images/Measure.png')");
          map.setMapCursor("default");
+        //  measurement.show();
          cleanMeasurementTool();
        });
 
-       $("#measurement").click(function() {
+       registry.byId("measurement").on("click", function() {
          navToolbar.activate(Navigation.PAN);
          $("#select").css("background-image", "url('images/Cursor.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
@@ -409,17 +435,17 @@
          $("#measurement").css("background-image", "url('images/MeasureHighlight.png')");
          map.setMapCursor("default");
          measurement.setTool("distance", true);
-         $("#measurementDiv").show();
+        //  $("#measurementDiv").show();
          isMeasureEnabled = true;
        });
 
        function extentHistoryChangeHandler() {
-         $("#zoomprev").disabled = navToolbar.isFirstExtent();
-         $("#zoomnext").disabled = navToolbar.isLastExtent();
+         registry.byId("zoomprev").disabled = navToolbar.isFirstExtent();
+         registry.byId("zoomnext").disabled = navToolbar.isLastExtent();
        }
 
        function cleanMeasurementTool() {
-         $("#measurementDiv").hide();
+        //  $("#measurementDiv").hide();
          measurement.clearResult();
          measurement.setTool("area", false);
          measurement.setTool("distance", false);
