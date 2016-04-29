@@ -160,7 +160,7 @@
       //   });
       // }
 
-      gettingGISData.coords().done(function(result) {
+      gettingGISData.coords().then(function(result) {
         var resultObj = $.parseJSON(result);
         // console.log(resultObj);
         var x = resultObj.features[0].geometry.x,
@@ -170,12 +170,12 @@
         addrCoords = new Point( coords, new esri.SpatialReference({wkid:2264}) );
         console.log("1 - get address coords");
         console.log(addrCoords);
-        gettingGISData.parcel(coords).done(function(result) {
+        gettingGISData.parcel(coords).then(function(result) {
           var resultObj = $.parseJSON(result);
           console.log(resultObj.features[0].geometry.rings[0]);
           polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
           console.log("2 - get parcel feature");
-        }).done(function() {
+        }).then(function() {
             pointGraphic = new Graphic(addrCoords, markerSymbol);
             polygonGraphic = new Graphic(polygonFeature, fillSymbol);
             map.centerAndZoom(addrCoords, 11);
