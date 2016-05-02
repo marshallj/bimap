@@ -31,6 +31,10 @@ html, body {
   color: #bbb;
 }
 
+p {
+  font-size: 0.8em;
+}
+
 *:focus {
     outline: none;
 }
@@ -57,7 +61,7 @@ a:active {
 }
 
 .calcite.nav-position-top .esriSimpleSlider {
-  margin-top: 100px !important;
+  margin-top: 90px !important;
 }
 
 #borderContainer {
@@ -148,17 +152,16 @@ a:active {
 
 
 #measurementDiv {
-  /*display: none;*/
-  height: 300px;
-  width: 500px;
-  display: block;
-  /*position: absolute;
-  right: 50px;
-  top: 100px;
-  padding: 5px;*/
-  /*border-radius: 5px;
+  display: none;
+  height: 210px;
+  width: 200px;
+  position: absolute;
+  right: 60px;
+  top: 90px;
+  padding: 5px;
+  border-radius: 5px;
   background-color: #fff;
-  border: 1px solid black;*/
+  border: 1px solid black;
   z-Index:1000;
 }
 
@@ -170,28 +173,16 @@ a:active {
   color: white;
 }
 
-/*.panel-container {
-  background-color: rgba(0, 0, 0, 0.5) !important;
-}*/
-
 .panel {
   background-color: rgba(0, 0, 0, 0.7) !important;
 }
-
-/*.panel-group {
-  background-color: rgba(0, 0, 0, 0.5) !important;
-}*/
-
-/*.panel-collapse {
-  background-color: rgba(0, 0, 0, 0.5) !important;
-}*/
 
 .fixed-panel {
   height: 90%;
   overflow-y: scroll;
 }
 
-.calcite .dijitButtonNode {
+#navButtons .dijitButtonNode {
   background-color: transparent !important;
   background-image: none !important;
   border: none !important;
@@ -199,7 +190,7 @@ a:active {
   border-radius: 0 !important;
 }
 
-.calcite .dijitButtonContents {
+#navButtons .dijitButtonContents {
   width: 42px;
   height: 42px;
   background-repeat: no-repeat;

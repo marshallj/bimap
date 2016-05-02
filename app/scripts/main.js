@@ -131,7 +131,7 @@
         fillSymbol: fillSymbol,
       }, domConstruct.create("div"));
 
-      map = new Map("mapDiv", {
+      map = new Map("map", {
         sliderOrientation : "vertical",
         extent: extent,
         infoWindow: popup
@@ -141,26 +141,11 @@
       /*************************** AJAX Promise **************************/
       /*******************************************************************/
 
-      var gettingGISData = {
-        coords: function () {
-          return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json').then(function(xyCoords) {
-            return xyCoords;
-          });
-        },
-        parcel: function (coords) {
-          return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json').then(function(parcel) {
-            return parcel;
-          });
-        }
-      };
+      var deferred = $.Deferred();
 
-      // function gettingParcelFeature() {
-      //   return $.ajax({
-      //     url: 'http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json'
-      //   });
-      // }
-
-      gettingGISData.coords().then(function(result) {
+      var gettingAddressCoords = deferred.then(function() {
+        return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json');
+      }).done(function(result) {
         var resultObj = $.parseJSON(result);
         // console.log(resultObj);
         var x = resultObj.features[0].geometry.x,
@@ -170,20 +155,69 @@
         addrCoords = new Point( coords, new esri.SpatialReference({wkid:2264}) );
         console.log("1 - get address coords");
         console.log(addrCoords);
-        gettingGISData.parcel(coords).then(function(result) {
-          var resultObj = $.parseJSON(result);
-          console.log(resultObj.features[0].geometry.rings[0]);
-          polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
-          console.log("2 - get parcel feature");
-        }).then(function() {
-            pointGraphic = new Graphic(addrCoords, markerSymbol);
-            polygonGraphic = new Graphic(polygonFeature, fillSymbol);
-            map.centerAndZoom(addrCoords, 11);
-            map.graphics.add(pointGraphic);
-            map.graphics.add(polygonGraphic);
-            console.log("3 - done")
-        })
       });
+
+      var gettingParcelFeature = gettingAddressCoords.then(function() {
+        return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json');
+      }).done(function(result) {
+        var resultObj = $.parseJSON(result);
+        console.log(resultObj.features[0].geometry.rings[0]);
+        polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
+        console.log("2 - get parcel feature");
+        pointGraphic = new Graphic(addrCoords, markerSymbol);
+        polygonGraphic = new Graphic(polygonFeature, fillSymbol);
+        map.centerAndZoom(addrCoords, 11);
+        map.graphics.add(pointGraphic);
+        map.graphics.add(polygonGraphic);
+        console.log("3 - done");
+      });
+
+      deferred.resolve();
+
+
+      // var gettingGISData = {
+      //   coords: function () {
+      //     return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json').then(function(xyCoords) {
+      //       return xyCoords;
+      //     });
+      //   },
+      //   parcel: function (coords) {
+      //     return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json').then(function(parcel) {
+      //       return parcel;
+      //     });
+      //   }
+      // };
+      //
+      // // function gettingParcelFeature() {
+      // //   return $.ajax({
+      // //     url: 'http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json'
+      // //   });
+      // // }
+      //
+      // gettingGISData.coords().then(function(result) {
+      //   var resultObj = $.parseJSON(result);
+      //   // console.log(resultObj);
+      //   var x = resultObj.features[0].geometry.x,
+      //       y = resultObj.features[0].geometry.y;
+      //   coords = [ x, y ];
+      //   console.log(coords);
+      //   addrCoords = new Point( coords, new esri.SpatialReference({wkid:2264}) );
+      //   console.log("1 - get address coords");
+      //   console.log(addrCoords);
+      //   gettingGISData.parcel(coords).then(function(result) {
+      //     var resultObj = $.parseJSON(result);
+      //     console.log(resultObj.features[0].geometry.rings[0]);
+      //     polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
+      //     console.log("2 - get parcel feature");
+      //   }).then(function() {
+      //       pointGraphic = new Graphic(addrCoords, markerSymbol);
+      //       polygonGraphic = new Graphic(polygonFeature, fillSymbol);
+      //       map.centerAndZoom(addrCoords, 11);
+      //       map.graphics.add(pointGraphic);
+      //       map.graphics.add(polygonGraphic);
+      //       console.log("3 - done")
+      //   })
+      // });
 
 
       // .done(gettingGISData.parcel(coords)).then(function(result) {
@@ -233,7 +267,7 @@
 
       var measurement = new Measurement({
         map: map
-      }, dom.byId("#measurementDiv"));
+      }, dom.byId("measurementDiv"));
       measurement.startup();
       // measurement.hideTool("location");
 
@@ -431,7 +465,6 @@
          $("#zoomin").css("background-image", "url('images/ZoomInSelect.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
          $("#select").css("background-image", "url('images/Cursor.png')");
-         $("#measurement").css("background-image", "url('images/Measure.png')");
          map.setMapCursor("url('images/ZoomInCursor.png'), auto");
          cleanMeasurementTool();
        });
@@ -441,7 +474,6 @@
          $("#zoomout").css("background-image", "url('images/ZoomOutSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
          $("#select").css("background-image", "url('images/Cursor.png')");
-         $("#measurement").css("background-image", "url('images/Measure.png')");
          map.setMapCursor("url('images/ZoomOutCursor.png'), auto");
          cleanMeasurementTool();
        });
@@ -467,9 +499,7 @@
          $("#select").css("background-image", "url('images/CursorSelect.png')");
          $("#zoomin").css("background-image", "url('images/ZoomIn.png')");
          $("#zoomout").css("background-image", "url('images/ZoomOut.png')");
-         $("#measurement").css("background-image", "url('images/Measure.png')");
          map.setMapCursor("default");
-        //  measurement.show();
          cleanMeasurementTool();
        });
 
@@ -481,7 +511,7 @@
          $("#measurement").css("background-image", "url('images/MeasureHighlight.png')");
          map.setMapCursor("default");
          measurement.setTool("distance", true);
-        //  $("#measurementDiv").show();
+         $("#measurementDiv").show();
          isMeasureEnabled = true;
        });
 
@@ -491,7 +521,8 @@
        }
 
        function cleanMeasurementTool() {
-        //  $("#measurementDiv").hide();
+         $("#measurementDiv").hide();
+         $("#measurement").css("background-image", "url('images/Measure.png')");
          measurement.clearResult();
          measurement.setTool("area", false);
          measurement.setTool("distance", false);
