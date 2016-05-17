@@ -26,16 +26,8 @@
     "dojo/_base/array",
     "dojo/dom-construct",
     "dojo/_base/connect",
-    "dijit/TitlePane",
-    "dijit/layout/BorderContainer",
-    "dijit/layout/ContentPane",
     "dojo/fx",
     "dijit/form/Button",
-    "dijit/layout/AccordionContainer",
-    "dijit/layout/AccordionPane",
-    "dijit/layout/BorderContainer",
-    "dijit/layout/ContentPane",
-    "dijit/TitlePane",
     "bootstrap/Tooltip",
     "dojo/domReady!"
   ], function (dom, Color, Map, Extent, Point, Polygon, TOC, ArcGISDynamicMapServiceLayer, ArcGISTiledMapServiceLayer, ImageParameters, Navigation, parser, registry, onDojo, InfoTemplate, SimpleFillSymbol,
@@ -69,32 +61,73 @@
         }
       });
 
-      var queryParams = $.getQueryParameters();
+      if (document.location.search) {
+        var queryParams = $.getQueryParameters();
 
-      var addressSakey = Number(queryParams.AddrID),
-          inCity = queryParams.City,
-          fldPlain = queryParams.FldPln,
-          locHistDist = queryParams.LocHistDist,
-          natHistResult = queryParams.NatHistDist,
-          overlayDist = queryParams.OvlDist,
-          landmarkProp = queryParams.LndMrkProp,
-          zoning = queryParams.Zoning,
-          cityBlock = queryParams.Grid,
-          censusTrct = queryParams.CenTract,
-          dateAnnex = decodeURIComponent(queryParams.AnnexDate);
+        var addressSakey = Number(queryParams.AddrID),
+            inCity = queryParams.City,
+            fldPlain = queryParams.FldPln,
+            locHistDist = queryParams.LocHistDist,
+            natHistResult = queryParams.NatHistDist,
+            overlayDist = queryParams.OvlDist,
+            landmarkProp = queryParams.LndMrkProp,
+            zoning = queryParams.Zoning,
+            cityBlock = queryParams.Grid,
+            censusTrct = queryParams.CenTract,
+            dateAnnex = decodeURIComponent(queryParams.AnnexDate);
 
-      if(document.location.search.length) {
-        $('#inCityResult').html(inCity);
-        $('#floodResult').html(fldPlain);
-        $('#locHistResult').html(locHistDist);
-        $('#natHistResult').html(natHistResult);
-        $('#overalyResult').html(overlayDist);
-        $('#landmarkResult').html(landmarkProp);
-        $('#zoningResult').html(zoning);
-        $('#blockResult').html(cityBlock);
-        $('#censusResult').html(censusTrct);
-        $('#annexResult').html(dateAnnex);
-      }
+          $('#inCityResult').html(inCity);
+          $('#floodResult').html(fldPlain);
+          $('#locHistResult').html(locHistDist);
+          $('#natHistResult').html(natHistResult);
+          $('#overalyResult').html(overlayDist);
+          $('#landmarkResult').html(landmarkProp);
+          $('#zoningResult').html(zoning);
+          $('#blockResult').html(cityBlock);
+          $('#censusResult').html(censusTrct);
+          $('#annexResult').html(dateAnnex);
+
+          /*******************************************************************/
+          /*************************** AJAX Promise **************************/
+          /*******************************************************************/
+
+          var deferred = $.Deferred();
+
+          var gettingAddressCoords = deferred.then(function() {
+            return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json');
+          }).done(function(result) {
+            var resultObj = $.parseJSON(result);
+            // console.log(resultObj);
+            var x = resultObj.features[0].geometry.x,
+                y = resultObj.features[0].geometry.y;
+            coords = [ x, y ];
+            console.log(coords);
+            addrCoords = new Point( coords, new esri.SpatialReference({wkid:2264}) );
+            console.log("1 - get address coords");
+            console.log(addrCoords);
+          });
+
+          var gettingParcelFeature = gettingAddressCoords.then(function() {
+            return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json');
+          }).done(function(result) {
+            var resultObj = $.parseJSON(result);
+            console.log(resultObj.features[0].geometry.rings[0]);
+            polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
+            console.log("2 - get parcel feature");
+            pointGraphic = new Graphic(addrCoords, markerSymbol);
+            polygonGraphic = new Graphic(polygonFeature, fillSymbol);
+            map.centerAndZoom(addrCoords, 11);
+            map.graphics.add(pointGraphic);
+            map.graphics.add(polygonGraphic);
+            console.log("3 - done");
+          });
+
+          deferred.resolve();
+
+          /*******************************************************************/
+          /*************************** AJAX Promise **************************/
+          /*******************************************************************/
+        }
 
       /*******************************************************************/
       /*************************** QueryParams ***************************/
@@ -114,47 +147,6 @@
         extent: extent,
         infoWindow: popup
       });
-
-      /*******************************************************************/
-      /*************************** AJAX Promise **************************/
-      /*******************************************************************/
-
-      var deferred = $.Deferred();
-
-      var gettingAddressCoords = deferred.then(function() {
-        return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json');
-      }).done(function(result) {
-        var resultObj = $.parseJSON(result);
-        // console.log(resultObj);
-        var x = resultObj.features[0].geometry.x,
-            y = resultObj.features[0].geometry.y;
-        coords = [ x, y ];
-        console.log(coords);
-        addrCoords = new Point( coords, new esri.SpatialReference({wkid:2264}) );
-        console.log("1 - get address coords");
-        console.log(addrCoords);
-      });
-
-      var gettingParcelFeature = gettingAddressCoords.then(function() {
-        return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json');
-      }).done(function(result) {
-        var resultObj = $.parseJSON(result);
-        console.log(resultObj.features[0].geometry.rings[0]);
-        polygonFeature = new Polygon( resultObj.features[0].geometry.rings[0] );
-        console.log("2 - get parcel feature");
-        pointGraphic = new Graphic(addrCoords, markerSymbol);
-        polygonGraphic = new Graphic(polygonFeature, fillSymbol);
-        map.centerAndZoom(addrCoords, 11);
-        map.graphics.add(pointGraphic);
-        map.graphics.add(polygonGraphic);
-        console.log("3 - done");
-      });
-
-      deferred.resolve();
-
-      /*******************************************************************/
-      /*************************** AJAX Promise **************************/
-      /*******************************************************************/
 
       var measurement = new Measurement({
         map: map

@@ -10,25 +10,9 @@ html, body {
   color: #E4CBB5;
 }
 
-#gsoLogo {
-  float: left;
-}
-
 #navTools {
   float: right;
   font-size: 1.1em;
-}
-
-.black {
-  color: #000;
-}
-
-.tan {
-  color: #E4CBB5;
-}
-
-.gray {
-  color: #bbb;
 }
 
 p {
@@ -61,15 +45,6 @@ a:active {
   margin-top: 90px !important;
 }
 
-#borderContainer {
-    width: 100%;
-    height: 100%;
-}
-
-#searchPrompt {
-  font-size: 1.0em;
-}
-
 .resultsTables, .drillDownResults, .drillStationResults {
   border: none;
 }
@@ -84,53 +59,14 @@ a:active {
   background: transparent;
 }
 
-#stationsToggle {
-  color: blue;
-  text-decoration: underline;
-}
-
-#header {
-  background-color: darkred;
-  background-size: 110% 100%;
-  /*background-image: url("../images/TitleBanner.png");*/
-  /*background-repeat: no-repeat;*/
-  /*background-size: cover;*/
-}
-
 #toolbar {
   height: 45px;
   margin-right: 20px;
 }
 
-#featureSearch {
-  position: absolute;
-  left: 85px;
-  top: 90px;
-  z-index: 1000;
-}
-
 #navButtons {
   margin-right: 20px;
   float: right;
-}
-
-#search {
-  position: absolute;
-  left: 70px;
-  top: 30px;
-  z-index: 2;
-}
-
-#mapDiv {
-    height:100%;
-}
-
-.measureContainer {
-  height: 100px;
-  width: 160px;
-  position: absolute;
-  right: 40px;
-  top: 100px;
 }
 
 #measurementDiv {
