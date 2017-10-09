@@ -44,7 +44,7 @@
       var isMeasureEnabled = false;
 
       // Geometry Service
-      esriConfig.defaults.geometryService = new esri.tasks.GeometryService("https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/Utilities/Geometry/GeometryServer");
+      esriConfig.defaults.geometryService = new esri.tasks.GeometryService("https://gisapps.greensboronc.org/" + webAdaptor + "/rest/services/Utilities/Geometry/GeometryServer");
 
       var markerSymbol = new SimpleMarkerSymbol(SimpleMarkerSymbol.STYLE_CIRCLE, 12,
         new SimpleLineSymbol(SimpleLineSymbol.STYLE_SOLID, new Color([0, 255, 255, 0.8]), 1),
@@ -95,7 +95,7 @@
           var deferred = $.Deferred();
 
           var gettingAddressCoords = deferred.then(function() {
-            return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json');
+            return $.ajax('http://gisapps.greensboronc.org/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/0/query?where=AD_SAKEY=' + addressSakey + ' &f=json');
           }).done(function(result) {
             var resultObj = $.parseJSON(result);
             // console.log(resultObj);
@@ -109,7 +109,7 @@
           });
 
           var gettingParcelFeature = gettingAddressCoords.then(function() {
-            return $.ajax('http://gis.greensboro-nc.gov/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json');
+            return $.ajax('http://gisapps.greensboronc.org/arcgis/rest/services/EngineeringInspections/BImap_MS/MapServer/10/query?geometryType=esriGeometryPoint&geometry=' + coords[0] + ',' + coords[1] + '&f=json');
           }).done(function(result) {
             var resultObj = $.parseJSON(result);
             console.log(resultObj.features[0].geometry.rings[0]);
@@ -157,7 +157,7 @@
       var imageParameters = new ImageParameters();
       imageParameters.format = "jpeg"; //set the image type to PNG24, note default is PNG8.
 
-      var bimapURL = "https://gis.greensboro-nc.gov/" + webAdaptor + "/rest/services/EngineeringInspections/BImap_MS/MapServer";
+      var bimapURL = "https://gisapps.greensboronc.org/" + webAdaptor + "/rest/services/EngineeringInspections/BImap_MS/MapServer";
       var orthoURL = "http://gis.co.guilford.nc.us/arcgis/rest/services/Basemaps/Guilford_2014_Orthos4Web_NAD83/MapServer"
 
       var dynamicMapServiceLayer = new ArcGISDynamicMapServiceLayer(bimapURL, {
